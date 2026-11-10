@@ -141,35 +141,54 @@ add_action(
 );
 
 /**
- * [alphonsus_wishlist] — the wishlist page grid.
+ * [alphonsus_wishlist] — the wishlist view (also used by the Wishlist page template).
  */
 add_shortcode(
 	'alphonsus_wishlist',
 	function () {
-		$products = array();
-		foreach ( alph_wishlist_ids() as $id ) {
-			$product = wc_get_product( $id );
-			if ( $product && 'publish' === $product->get_status() ) {
-				$products[] = $product;
-			}
-		}
-
 		ob_start();
-		echo '<div class="wishlist" data-wishlist-page>';
-		echo '<div class="empty-state"' . ( $products ? ' hidden' : '' ) . '>';
-		echo alph_icon( 'heart', 40 ); // phpcs:ignore WordPress.Security.EscapeOutput
-		echo '<h2>' . esc_html__( 'Your wishlist is empty', 'alphonsus' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Tap the heart on any book to save it here for later.', 'alphonsus' ) . '</p>';
-		echo '<a class="btn btn--primary" href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '">' . esc_html__( 'Browse the shop', 'alphonsus' ) . '</a>';
-		echo '</div>';
-		if ( $products ) {
-			echo '<div class="product-grid">';
-			foreach ( $products as $product ) {
-				alph_product_card( $product, 'h2' );
-			}
-			echo '</div>';
-		}
-		echo '</div>';
+		get_template_part( 'template-parts/wishlist', null, array( 'heading' => 'h2' ) );
 		return ob_get_clean();
 	}
+);
+
+/**
+ * "Add all to cart" from the wishlist page: simple, in-stock books go straight in.
+ */
+add_action(
+	'wp_loaded',
+	function () {
+		if ( empty( $_POST['alph_add_all'] ) ) {
+			return;
+		}
+		if ( ! isset( $_POST['_alph_add_all'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_alph_add_all'] ) ), 'alph_add_all' ) ) {
+			return;
+		}
+		if ( ! WC()->cart ) {
+			wc_load_cart();
+		}
+		$added   = 0;
+		$skipped = 0;
+		foreach ( alph_wishlist_ids() as $id ) {
+			$product = wc_get_product( $id );
+			if ( $product && $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock() ) {
+				if ( WC()->cart->add_to_cart( $id, 1 ) ) {
+					++$added;
+				}
+			} else {
+				++$skipped;
+			}
+		}
+		if ( $added ) {
+			/* translators: %d: number of books */
+			wc_add_notice( sprintf( _n( '%d book from your wishlist was added to your cart.', '%d books from your wishlist were added to your cart.', $added, 'alphonsus' ), $added ) );
+		}
+		if ( $skipped ) {
+			/* translators: %d: number of books */
+			wc_add_notice( sprintf( _n( '%d book needs options chosen or is out of stock, so it stayed in your wishlist.', '%d books need options chosen or are out of stock, so they stayed in your wishlist.', $skipped, 'alphonsus' ), $skipped ), 'notice' );
+		}
+		wp_safe_redirect( wc_get_cart_url() );
+		exit;
+	},
+	25
 );

@@ -22,6 +22,7 @@ function alph_install() {
 		'swedish-school' => array( __( 'Swedish School', 'alphonsus' ), 'page-templates/swedish-school.php' ),
 		'wellness'       => array( __( 'Wellness', 'alphonsus' ), 'page-templates/wellness.php' ),
 		'merch'          => array( __( 'Merch', 'alphonsus' ), 'page-templates/merch.php' ),
+		'wishlist'       => array( __( 'Wishlist', 'alphonsus' ), 'page-templates/wishlist.php' ),
 	);
 	foreach ( $pages as $slug => $page ) {
 		$existing = get_page_by_path( $slug );

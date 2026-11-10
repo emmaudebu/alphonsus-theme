@@ -170,8 +170,17 @@ function alph_product_badge( WC_Product $product ) {
 /**
  * Add-to-cart (AJAX for simple products) or "View" button for a card.
  */
-function alph_card_button( WC_Product $product, $large = false ) {
-	$cls = $large ? 'btn btn--amber' : 'btn-add';
+function alph_card_button( WC_Product $product, $large = false, $labelled = false ) {
+	if ( $large ) {
+		$cls   = 'btn btn--amber';
+		$label = __( 'Add bundle to cart', 'alphonsus' );
+	} elseif ( $labelled ) {
+		$cls   = 'btn btn--primary btn--sm';
+		$label = __( 'Add to cart', 'alphonsus' );
+	} else {
+		$cls   = 'btn-add';
+		$label = __( 'Add', 'alphonsus' );
+	}
 	if ( $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock() ) {
 		return sprintf(
 			'<a href="%1$s" data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="%7$s add_to_cart_button ajax_add_to_cart product_type_simple" aria-label="%4$s" rel="nofollow">%5$s<span>%6$s</span></a>',
@@ -180,7 +189,7 @@ function alph_card_button( WC_Product $product, $large = false ) {
 			esc_attr( $product->get_sku() ),
 			esc_attr( $product->add_to_cart_description() ),
 			alph_icon( 'bag', 15 ),
-			$large ? esc_html__( 'Add bundle to cart', 'alphonsus' ) : esc_html__( 'Add', 'alphonsus' ),
+			esc_html( $label ),
 			esc_attr( $cls )
 		);
 	}
@@ -190,7 +199,7 @@ function alph_card_button( WC_Product $product, $large = false ) {
 		/* translators: %s: product name. */
 		esc_attr( sprintf( __( 'View options for %s', 'alphonsus' ), $product->get_name() ) ),
 		alph_icon( 'arrow', 15 ),
-		esc_html__( 'View', 'alphonsus' ),
+		$product->is_in_stock() ? esc_html__( 'View', 'alphonsus' ) : esc_html__( 'Details', 'alphonsus' ),
 		esc_attr( $cls )
 	);
 }

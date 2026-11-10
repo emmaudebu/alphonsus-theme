@@ -65,6 +65,24 @@
 		}
 	} );
 
+	/* Mobile search toggle ---------------------------------------- */
+
+	var searchToggle = document.querySelector( '[data-search-toggle]' );
+	var siteHeader = document.querySelector( '.site-header' );
+	if ( searchToggle && siteHeader ) {
+		searchToggle.addEventListener( 'click', function () {
+			var open = ! siteHeader.classList.contains( 'search-open' );
+			siteHeader.classList.toggle( 'search-open', open );
+			searchToggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+			if ( open ) {
+				var input = siteHeader.querySelector( '.search input[type="search"]' );
+				if ( input ) {
+					input.focus();
+				}
+			}
+		} );
+	}
+
 	/* Sticky header shadow -------------------------------------------- */
 
 	var header = document.querySelector( '[data-sticky-header]' );
@@ -214,6 +232,45 @@
 		saveWishlist();
 	}
 
+	function formatPrice( amount ) {
+		var p = data.price;
+		if ( ! p ) {
+			return String( amount );
+		}
+		var parts = Number( amount ).toFixed( p.decimals ).split( '.' );
+		parts[ 0 ] = parts[ 0 ].replace( /\B(?=(\d{3})+(?!\d))/g, p.thou );
+		var num = parts.join( p.dec );
+		return p.format.replace( '%1$s', p.symbol ).replace( '%2$s', num ).replace( /&nbsp;/g, '\u00a0' );
+	}
+
+	function updateWishlistSummary( page ) {
+		var rows = page.querySelectorAll( '[data-wl-item]' );
+		var total = 0;
+		rows.forEach( function ( r ) {
+			total += Number( r.getAttribute( 'data-price' ) ) || 0;
+		} );
+		var count = page.querySelector( '[data-wl-count]' );
+		var sum = page.querySelector( '[data-wl-total]' );
+		if ( count ) {
+			count.textContent = rows.length;
+		}
+		if ( sum ) {
+			sum.textContent = formatPrice( total );
+		}
+		if ( ! rows.length ) {
+			[ '[data-wl-summary]', '[data-wl-addall]', '[data-wl-list]' ].forEach( function ( sel ) {
+				var el = page.querySelector( sel );
+				if ( el ) {
+					el.hidden = true;
+				}
+			} );
+			var empty = page.querySelector( '[data-wl-empty]' );
+			if ( empty ) {
+				empty.hidden = false;
+			}
+		}
+	}
+
 	document.addEventListener( 'click', function ( e ) {
 		var btn = e.target.closest( '[data-wishlist]' );
 		if ( ! btn ) {
@@ -234,19 +291,15 @@
 		} );
 		toast( on ? i18n.added : i18n.removed );
 
-		// On the wishlist page, removing a book removes its card.
+		// On the wishlist page, removing a saved book removes its row and updates the totals.
 		var page = btn.closest( '[data-wishlist-page]' );
-		if ( page && ! on ) {
-			var card = btn.closest( '.product-card' );
-			if ( card ) {
-				card.remove();
-			}
-			if ( ! page.querySelector( '.product-card' ) ) {
-				var empty = page.querySelector( '.empty-state' );
-				if ( empty ) {
-					empty.hidden = false;
-				}
-			}
+		var row = btn.closest( '[data-wl-item]' );
+		if ( page && row && ! on ) {
+			row.classList.add( 'is-leaving' );
+			setTimeout( function () {
+				row.remove();
+				updateWishlistSummary( page );
+			}, 250 );
 		}
 	} );
 

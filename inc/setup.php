@@ -62,6 +62,13 @@ add_action(
 			array(
 				'restUrl'  => esc_url_raw( rest_url( 'alphonsus/v1/' ) ),
 				'shopUrl'  => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ),
+				'price'    => function_exists( 'wc_get_price_decimals' ) ? array(
+					'symbol'   => html_entity_decode( get_woocommerce_currency_symbol() ),
+					'format'   => html_entity_decode( get_woocommerce_price_format() ),
+					'decimals' => wc_get_price_decimals(),
+					'dec'      => wc_get_price_decimal_separator(),
+					'thou'     => wc_get_price_thousand_separator(),
+				) : null,
 				'i18n'     => array(
 					'added'     => __( 'Added to wishlist', 'alphonsus' ),
 					'removed'     => __( 'Removed from wishlist', 'alphonsus' ),

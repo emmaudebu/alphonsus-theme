@@ -31,7 +31,7 @@ $alph_ext      = alph_is_external( $alph_donate ) ? ' target="_blank" rel="noope
 				<li>
 					<?php echo alph_icon( 'phone', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 					<?php if ( $alph_phone ) : ?>
-						<a href="https://wa.me/<?php echo esc_attr( preg_replace( '/\D+/', '', $alph_phone ) ); ?>"><?php echo esc_html( sprintf( /* translators: %s: phone number */ __( 'Call/WhatsApp: %s', 'alphonsus' ), $alph_phone ) ); ?></a>
+						<a href="https://wa.me/<?php echo esc_attr( preg_replace( '/\D+/', '', $alph_phone ) ); ?>"><span class="topbar__label"><?php esc_html_e( 'Call/WhatsApp:', 'alphonsus' ); ?> </span><?php echo esc_html( $alph_phone ); ?></a>
 					<?php endif; ?>
 					<?php if ( $alph_email ) : ?>
 						<span class="topbar__sep" aria-hidden="true">·</span><a href="mailto:<?php echo esc_attr( $alph_email ); ?>"><?php echo esc_html( $alph_email ); ?></a>
@@ -75,6 +75,9 @@ $alph_ext      = alph_is_external( $alph_donate ) ? ' target="_blank" rel="noope
 		?>
 
 		<div class="header-actions">
+			<button type="button" class="icon-btn search-toggle" aria-controls="header-search" aria-expanded="false" aria-label="<?php esc_attr_e( 'Search', 'alphonsus' ); ?>" data-search-toggle>
+				<?php echo alph_icon( 'search', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			</button>
 			<?php if ( $alph_has_wc ) : ?>
 				<a class="icon-btn" href="<?php echo esc_url( alph_wishlist_page_url() ); ?>" aria-label="<?php esc_attr_e( 'Wishlist', 'alphonsus' ); ?>">
 					<?php echo alph_icon( 'heart', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>

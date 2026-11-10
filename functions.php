@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ALPH_VERSION', '2.0.0' );
+define( 'ALPH_VERSION', '2.1.0' );
 define( 'ALPH_DIR', get_template_directory() );
 define( 'ALPH_URI', get_template_directory_uri() );
 
