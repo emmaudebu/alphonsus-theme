@@ -337,4 +337,295 @@
 		} );
 		validate();
 	} );
+
+	/* Shop filters collapse on small screens ------------------------ */
+
+	document.querySelectorAll( '[data-filters-toggle]' ).forEach( function ( d ) {
+		if ( window.matchMedia( '(max-width: 1024px)' ).matches && ! document.querySelector( '.active-filters' ) ) {
+			d.open = false;
+		}
+	} );
+
+	/* Currency picker ----------------------------------------------- */
+
+	var currencyModal = document.getElementById( 'currency-modal' );
+	if ( currencyModal && 'function' === typeof currencyModal.showModal ) {
+		document.querySelectorAll( '[data-currency-open]' ).forEach( function ( btn ) {
+			btn.addEventListener( 'click', function () {
+				currencyModal.showModal();
+			} );
+		} );
+		var cSearch = currencyModal.querySelector( '[data-currency-search]' );
+		if ( cSearch ) {
+			cSearch.addEventListener( 'input', function () {
+				var q = cSearch.value.trim().toLowerCase();
+				currencyModal.querySelectorAll( '.currency-row' ).forEach( function ( row ) {
+					row.hidden = q && row.getAttribute( 'data-search' ).indexOf( q ) === -1;
+				} );
+			} );
+		}
+		currencyModal.addEventListener( 'close', function () {
+			if ( 'save' !== currencyModal.returnValue ) {
+				return;
+			}
+			var chosen = currencyModal.querySelector( 'input[name="currency"]:checked' );
+			if ( chosen ) {
+				document.cookie = 'psmmc_currency=' + encodeURIComponent( chosen.value ) + ';path=/;max-age=86400;SameSite=Lax' + ( 'https:' === location.protocol ? ';Secure' : '' );
+				window.location.reload();
+			}
+		} );
+		currencyModal.addEventListener( 'click', function ( e ) {
+			if ( e.target === currencyModal ) {
+				currencyModal.close( 'cancel' );
+			}
+		} );
+	}
+
+	/* Donation tiers fill the amount field -------------------------- */
+
+	document.querySelectorAll( '[data-donate]' ).forEach( function ( form ) {
+		var amount = form.querySelector( 'input[name="amount"]' );
+		form.querySelectorAll( 'input[name="tier"]' ).forEach( function ( radio ) {
+			radio.addEventListener( 'change', function () {
+				if ( amount ) {
+					amount.value = radio.value;
+				}
+			} );
+		} );
+		if ( amount ) {
+			amount.addEventListener( 'input', function () {
+				form.querySelectorAll( 'input[name="tier"]' ).forEach( function ( radio ) {
+					radio.checked = radio.value === amount.value;
+				} );
+			} );
+		}
+	} );
+
+	/* "Enrol" buttons pre-select the course in the enrolment form ---- */
+
+	document.querySelectorAll( '[data-track]' ).forEach( function ( link ) {
+		link.addEventListener( 'click', function () {
+			var select = document.querySelector( '#enrol select[name="track"]' );
+			var value = link.getAttribute( 'data-track' );
+			if ( select && Array.prototype.some.call( select.options, function ( o ) {
+				return o.value === value;
+			} ) ) {
+				select.value = value;
+			}
+		} );
+	} );
+
+	/* Merch category pills filter the grid in place ------------------- */
+
+	document.querySelectorAll( '[data-filter-pills]' ).forEach( function ( nav ) {
+		var grid = document.querySelector( '[data-filter-grid]' );
+		nav.addEventListener( 'click', function ( e ) {
+			var pill = e.target.closest( '[data-filter]' );
+			if ( ! pill || ! grid ) {
+				return;
+			}
+			var f = pill.getAttribute( 'data-filter' );
+			nav.querySelectorAll( '.pill' ).forEach( function ( p ) {
+				p.classList.toggle( 'is-active', p === pill );
+			} );
+			grid.querySelectorAll( '[data-cats]' ).forEach( function ( cell ) {
+				cell.hidden = 'all' !== f && ( ' ' + cell.getAttribute( 'data-cats' ) + ' ' ).indexOf( ' ' + f + ' ' ) === -1;
+			} );
+		} );
+	} );
+
+	/* Reading Journey ----------------------------------------------- */
+
+	var rj = window.alphReading;
+	var rjRoot = document.querySelector( '[data-rj]' );
+	if ( rj && rjRoot ) {
+		var rjI18n = rj.i18n || {};
+		var rjPost = function ( path, body ) {
+			return fetch( rj.url + path, {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': rj.nonce },
+				body: JSON.stringify( body || {} ),
+			} ).then( function ( r ) {
+				if ( ! r.ok ) {
+					throw new Error( r.status );
+				}
+				return r.json();
+			} );
+		};
+		var rjFail = function () {
+			toast( rjI18n.error );
+		};
+
+		// Timer: survives reloads by keeping its state in localStorage.
+		var KEY = 'alph_rj_timer';
+		var store = {
+			get: function () {
+				try {
+					return JSON.parse( localStorage.getItem( KEY ) ) || null;
+				} catch ( e ) {
+					return null;
+				}
+			},
+			set: function ( v ) {
+				try {
+					if ( v ) {
+						localStorage.setItem( KEY, JSON.stringify( v ) );
+					} else {
+						localStorage.removeItem( KEY );
+					}
+				} catch ( e ) {}
+			},
+		};
+		var timerEl = rjRoot.querySelector( '[data-rj-timer]' );
+		var clock = rjRoot.querySelector( '[data-rj-clock]' );
+		var startBtn = rjRoot.querySelector( '[data-rj-start]' );
+		var pauseBtn = rjRoot.querySelector( '[data-rj-pause]' );
+		var bookSel = rjRoot.querySelector( '[data-rj-book]' );
+		var tick = null;
+
+		var elapsed = function ( t ) {
+			return ( t.acc || 0 ) + ( t.start ? Date.now() - t.start : 0 );
+		};
+		var paint = function () {
+			var t = store.get();
+			var ms = t ? elapsed( t ) : 0;
+			var s = Math.floor( ms / 1000 );
+			clock.textContent = String( Math.floor( s / 60 ) ).padStart( 2, '0' ) + ':' + String( s % 60 ).padStart( 2, '0' );
+			var running = !! ( t && t.start );
+			timerEl.classList.toggle( 'is-running', running );
+			startBtn.querySelector( 'span' ).textContent = t ? rjI18n.stop : rjI18n.start;
+			pauseBtn.hidden = ! t;
+			pauseBtn.querySelector( 'span' ).textContent = running ? rjI18n.pause : rjI18n.resume;
+		};
+		var loop = function () {
+			clearInterval( tick );
+			tick = setInterval( paint, 1000 );
+			paint();
+		};
+
+		if ( timerEl ) {
+			var saved = store.get();
+			if ( saved ) {
+				if ( bookSel && saved.book ) {
+					bookSel.value = String( saved.book );
+				}
+				loop();
+			}
+			startBtn.addEventListener( 'click', function () {
+				var t = store.get();
+				if ( ! t ) {
+					store.set( { start: Date.now(), acc: 0, book: bookSel ? Number( bookSel.value ) : 0 } );
+					loop();
+					return;
+				}
+				// Stop & log.
+				var minutes = Math.max( 1, Math.round( elapsed( t ) / 60000 ) );
+				store.set( null );
+				clearInterval( tick );
+				paint();
+				rjPost( 'log', { minutes: Math.min( 600, minutes ), product: t.book || 0, date: rj.today } ).then( function () {
+					toast( rjI18n.logged );
+					setTimeout( function () {
+						window.location.reload();
+					}, 700 );
+				} ).catch( rjFail );
+			} );
+			pauseBtn.addEventListener( 'click', function () {
+				var t = store.get();
+				if ( ! t ) {
+					return;
+				}
+				if ( t.start ) {
+					t.acc = elapsed( t );
+					t.start = 0;
+				} else {
+					t.start = Date.now();
+				}
+				store.set( t );
+				paint();
+			} );
+			if ( bookSel ) {
+				bookSel.addEventListener( 'change', function () {
+					var t = store.get();
+					if ( t ) {
+						t.book = Number( bookSel.value );
+						store.set( t );
+					}
+				} );
+			}
+		}
+
+		// Manual log.
+		var logToggle = rjRoot.querySelector( '[data-rj-log-toggle]' );
+		var logForm = rjRoot.querySelector( '[data-rj-log]' );
+		if ( logToggle && logForm ) {
+			logToggle.addEventListener( 'click', function () {
+				logForm.hidden = ! logForm.hidden;
+				logToggle.setAttribute( 'aria-expanded', logForm.hidden ? 'false' : 'true' );
+				if ( ! logForm.hidden ) {
+					logForm.querySelector( 'input' ).focus();
+				}
+			} );
+			logForm.addEventListener( 'submit', function ( e ) {
+				e.preventDefault();
+				var fd = new FormData( logForm );
+				rjPost( 'log', { minutes: Number( fd.get( 'minutes' ) ), date: fd.get( 'date' ), product: Number( fd.get( 'product' ) ) } ).then( function () {
+					toast( rjI18n.logged );
+					setTimeout( function () {
+						window.location.reload();
+					}, 700 );
+				} ).catch( rjFail );
+			} );
+		}
+
+		var undo = rjRoot.querySelector( '[data-rj-undo]' );
+		if ( undo ) {
+			undo.addEventListener( 'click', function () {
+				rjPost( 'undo' ).then( function () {
+					window.location.reload();
+				} ).catch( rjFail );
+			} );
+		}
+
+		// Quests.
+		rjRoot.querySelectorAll( '[data-rj-quest]' ).forEach( function ( box ) {
+			box.addEventListener( 'change', function () {
+				rjPost( 'quest', { key: box.getAttribute( 'data-rj-quest' ), done: box.checked } ).then( function () {
+					toast( rjI18n.saved );
+				} ).catch( function () {
+					box.checked = ! box.checked;
+					rjFail();
+				} );
+			} );
+		} );
+
+		// Goal tiers.
+		rjRoot.querySelectorAll( '[data-rj-goal]' ).forEach( function ( btn ) {
+			btn.addEventListener( 'click', function () {
+				rjPost( 'goal', { minutes: Number( btn.getAttribute( 'data-rj-goal' ) ) } ).then( function () {
+					window.location.reload();
+				} ).catch( rjFail );
+			} );
+		} );
+
+		// Book progress sliders (saved when released).
+		rjRoot.querySelectorAll( '[data-rj-progress]' ).forEach( function ( range ) {
+			var label = range.closest( '.bp' ).querySelector( '[data-rj-pct]' );
+			range.addEventListener( 'input', function () {
+				range.style.setProperty( '--pct', range.value + '%' );
+				label.textContent = range.value + '%';
+			} );
+			range.addEventListener( 'change', function () {
+				rjPost( 'progress', { product: Number( range.getAttribute( 'data-rj-progress' ) ), percent: Number( range.value ) } ).then( function () {
+					toast( rjI18n.saved );
+					if ( '100' === range.value ) {
+						setTimeout( function () {
+							window.location.reload();
+						}, 600 );
+					}
+				} ).catch( rjFail );
+			} );
+		} );
+	}
 }() );

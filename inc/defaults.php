@@ -25,7 +25,7 @@ function alph_settings_schema() {
 				'address'      => array( __( 'Address', 'alphonsus' ), 'Admiralty Way, Lekki, Lagos, Nigeria', 'text' ),
 				'topbar_msg_1' => array( __( 'Top bar message 1', 'alphonsus' ), 'Swedish & English Bilingual Curricula', 'text' ),
 				'topbar_msg_2' => array( __( 'Top bar message 2', 'alphonsus' ), 'Curated Book Bundles to Inspire Learning • Worldwide Delivery Available', 'text' ),
-				'donate_url'   => array( __( 'Donate link', 'alphonsus' ), 'https://paystack.shop/pay/alphonsuslibrary', 'url' ),
+				'donate_url'   => array( __( 'Donate link (default: the Foundation page donation form)', 'alphonsus' ), '/foundation/#donate', 'url' ),
 				'notify_email' => array( __( 'Send form entries to (blank = site admin email)', 'alphonsus' ), '', 'email' ),
 				'facebook'     => array( __( 'Facebook URL', 'alphonsus' ), 'https://www.facebook.com/Alphonsuslibrary', 'url' ),
 				'instagram'    => array( __( 'Instagram URL', 'alphonsus' ), 'https://www.instagram.com/alphonsus_library', 'url' ),
@@ -52,8 +52,8 @@ function alph_settings_schema() {
 				'hero_image'      => array( __( 'Hero image', 'alphonsus' ), 0, 'image' ),
 				'hero_card_title' => array( __( 'Image caption title', 'alphonsus' ), 'Curated Bundle Sets', 'text' ),
 				'hero_card_text'  => array( __( 'Image caption text', 'alphonsus' ), 'Picture Dictionary, Golden Hands & Early Readers', 'text' ),
-				'stats'           => array( __( 'Stats (value | label, one per line)', 'alphonsus' ), "12,500+ | Books Delivered\n100% | Bilingual Curriculum\n4.9 / 5 | Parent Satisfaction", 'lines' ),
-				'features'        => array( __( 'Feature strip (title | subtitle, one per line)', 'alphonsus' ), "Curated for All Ages | Toddlers to polyglot youth\nQuality Books They’ll Love | Rich colours & tactile covers\nLearn Today, Lead Tomorrow | Global literacy minded\nGreat Value for Parents | Bundle savings up to 20%", 'lines' ),
+				'stats'           => array( __( 'Stats (value | label, one per line) — empty hides', 'alphonsus' ), '', 'lines' ),
+				'features'        => array( __( 'Feature strip (title | subtitle, one per line)', 'alphonsus' ), "Curated for All Ages | Toddlers to polyglot youth\nQuality Books They’ll Love | Rich colours & tactile covers\nLearn Today, Lead Tomorrow | Global literacy minded\nGreat Value for Parents | Savings on curated bundles", 'lines' ),
 			),
 		),
 		'alph_sections'   => array(
@@ -81,7 +81,7 @@ function alph_settings_schema() {
 		'alph_promo'      => array(
 			'title'  => __( 'Homepage: Swedish promo', 'alphonsus' ),
 			'fields' => array(
-				'promo_badge'   => array( __( 'Badge', 'alphonsus' ), 'Authorised Swedish Language Program', 'text' ),
+				'promo_badge'   => array( __( 'Badge', 'alphonsus' ), 'Swedish Language Programme', 'text' ),
 				'promo_title'   => array( __( 'Title', 'alphonsus' ), 'Master Swedish With Our Beginner-Friendly Books', 'text' ),
 				'promo_text'    => array( __( 'Text', 'alphonsus' ), 'From everyday vocabulary and native phonetics to interactive workbooks tailored for African and international learners. Start your Scandinavian fluency journey with confidence today.', 'textarea' ),
 				'promo_product' => array( __( 'Featured product ID', 'alphonsus' ), 2124, 'number' ),
@@ -97,9 +97,9 @@ function alph_settings_schema() {
 			'fields' => array(
 				'presale_badge'   => array( __( 'Badge', 'alphonsus' ), 'Collector Edition', 'text' ),
 				'presale_title'   => array( __( 'Title', 'alphonsus' ), 'Hardcover Pre-Sales', 'text' ),
-				'presale_text'    => array( __( 'Text', 'alphonsus' ), 'Secure your hardcover copies now and enjoy exclusive early-bird discounts on these highly anticipated books. Limited print run crafted with linen binding and gold foil titles.', 'textarea' ),
-				'presale_points'  => array( __( 'Highlights (one per line)', 'alphonsus' ), "Signed author bookplate in every hardcover\nPriority dispatch before general bookstore release", 'lines' ),
-				'presale_percent' => array( __( 'Allocation reserved (%)', 'alphonsus' ), 74, 'number' ),
+				'presale_text'    => array( __( 'Text', 'alphonsus' ), 'Secure your hardcover copies of our upcoming titles. Tell us which books you would like and we will contact you with prices and dates.', 'textarea' ),
+				'presale_points'  => array( __( 'Highlights (one per line) — empty hides', 'alphonsus' ), '', 'lines' ),
+				'presale_percent' => array( __( 'Allocation reserved (%) — 0 hides the bar', 'alphonsus' ), 0, 'number' ),
 				'presale_books'   => array( __( 'Books offered in the form (one per line)', 'alphonsus' ), "Swedish A1–A2 workbooks & Textbook\nPronunciation book 1 & 2\nSwedish guide\nKofi's Magical Journey\nJafari's Big Heart\nThe Girl Who Spoke to Animals\nRainbow Colors of Africa\nThe Secret Garden of Limba\nIsland of Chocolate\nVagina book\nBreast book", 'lines' ),
 			),
 		),
@@ -111,7 +111,7 @@ function alph_settings_schema() {
 				'found_badge'      => array( __( 'Foundation badge', 'alphonsus' ), 'Alphonsus Foundation', 'text' ),
 				'found_title'      => array( __( 'Foundation title', 'alphonsus' ), 'Giving Every Child the Right to Read & Dream', 'text' ),
 				'found_text'       => array( __( 'Foundation text', 'alphonsus' ), 'Through our community book outreach, we provide free storybooks, school supplies, and reading sessions to underserved primary schools across Nigeria and West Africa.', 'textarea' ),
-				'found_points'     => array( __( 'Foundation highlights (one per line)', 'alphonsus' ), "Community library corners\nFree weekend reading & literacy workshops\nAnnual Young Writers & Illustrators Grant", 'lines' ),
+				'found_points'     => array( __( 'Foundation highlights (one per line) — empty hides', 'alphonsus' ), '', 'lines' ),
 				'found_btn'        => array( __( 'Foundation button text', 'alphonsus' ), 'Support The Foundation (Donate)', 'text' ),
 				'newsletter_eyebrow' => array( __( 'Newsletter eyebrow', 'alphonsus' ), 'Lifelong literacy & polyglot futures', 'text' ),
 				'newsletter_title' => array( __( 'Newsletter title', 'alphonsus' ), 'Join our young readers & language learners club', 'text' ),
@@ -119,6 +119,8 @@ function alph_settings_schema() {
 			),
 		),
 	);
+
+	$schema += alph_pages_schema();
 
 	return $schema;
 }
@@ -170,4 +172,32 @@ function alph_url( $key ) {
 		return '';
 	}
 	return 0 === strpos( $url, '/' ) ? home_url( $url ) : $url;
+}
+
+/**
+ * Paragraphs from a textarea setting (blank line separates paragraphs).
+ */
+function alph_paragraphs( $key ) {
+	$out = '';
+	foreach ( preg_split( '/\R\s*\R/', trim( (string) alph_mod( $key ) ) ) as $para ) {
+		if ( '' !== trim( $para ) ) {
+			$out .= '<p>' . esc_html( trim( $para ) ) . '</p>';
+		}
+	}
+	return $out;
+}
+
+/**
+ * Comma-separated image IDs from a setting.
+ */
+function alph_image_ids( $key ) {
+	return array_values( array_filter( array_map( 'absint', explode( ',', (string) alph_mod( $key ) ) ), 'wp_attachment_is_image' ) );
+}
+
+/**
+ * True when a link points away from this site.
+ */
+function alph_is_external( $url ) {
+	$host = wp_parse_url( $url, PHP_URL_HOST );
+	return $host && wp_parse_url( home_url(), PHP_URL_HOST ) !== $host;
 }

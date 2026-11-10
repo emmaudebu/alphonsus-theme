@@ -67,15 +67,17 @@ $alph_blog   = get_option( 'page_for_posts' ) ? get_permalink( get_option( 'page
 				<span class="chip chip--glass"><?php echo alph_icon( 'users', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( alph_mod( 'found_badge' ) ); ?></span>
 				<h3 id="foundation-title"><?php echo esc_html( alph_mod( 'found_title' ) ); ?></h3>
 				<p><?php echo esc_html( alph_mod( 'found_text' ) ); ?></p>
-				<ul>
-					<?php foreach ( alph_lines( 'found_points' ) as $alph_point ) : ?>
-						<li><?php echo esc_html( $alph_point ); ?></li>
-					<?php endforeach; ?>
-				</ul>
+				<?php if ( alph_lines( 'found_points' ) ) : ?>
+					<ul>
+						<?php foreach ( alph_lines( 'found_points' ) as $alph_point ) : ?>
+							<li><?php echo esc_html( $alph_point ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
 			</div>
 			<div class="foundation-card__actions">
 				<?php if ( alph_mod( 'donate_url' ) ) : ?>
-					<a class="btn btn--orange btn--block" href="<?php echo esc_url( alph_mod( 'donate_url' ) ); ?>" target="_blank" rel="noopener"><?php echo alph_icon( 'heart', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( alph_mod( 'found_btn' ) ); ?></a>
+					<a class="btn btn--amber btn--block" href="<?php echo esc_url( alph_url( 'donate_url' ) ); ?>"><?php echo alph_icon( 'heart', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( alph_mod( 'found_btn' ) ); ?></a>
 				<?php endif; ?>
 				<?php $alph_found_page = get_page_by_path( 'foundation' ); ?>
 				<?php if ( $alph_found_page ) : ?>

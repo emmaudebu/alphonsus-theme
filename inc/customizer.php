@@ -11,6 +11,15 @@ add_action(
 	'customize_register',
 	function ( WP_Customize_Manager $wp_customize ) {
 		$wp_customize->add_panel(
+			'alph_pages_panel',
+			array(
+				'title'       => __( 'Alphonsus Pages', 'alphonsus' ),
+				'description' => __( 'Text, images and lists for the Book Shop, Foundation, About, Contact, Swedish School, Wellness and Merch pages. Sections whose list is empty stay hidden on the site.', 'alphonsus' ),
+				'priority'    => 31,
+			)
+		);
+
+		$wp_customize->add_panel(
 			'alph_panel',
 			array(
 				'title'       => __( 'Alphonsus Homepage & Site', 'alphonsus' ),
@@ -35,7 +44,7 @@ add_action(
 				$section_id,
 				array(
 					'title' => $section['title'],
-					'panel' => 'alph_panel',
+					'panel' => $section['panel'] ?? 'alph_panel',
 				)
 			);
 

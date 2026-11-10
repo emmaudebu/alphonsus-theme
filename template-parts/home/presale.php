@@ -19,11 +19,13 @@ $alph_icons   = array( 'pen', 'truck', 'bookmark', 'award' );
 			<h2 id="presale-title" class="presale__title"><?php echo esc_html( alph_mod( 'presale_title' ) ); ?></h2>
 			<p><?php echo esc_html( alph_mod( 'presale_text' ) ); ?></p>
 
-			<ul class="perks">
-				<?php foreach ( alph_lines( 'presale_points' ) as $alph_i => $alph_point ) : ?>
-					<li><span class="perks__icon"><?php echo alph_icon( $alph_icons[ $alph_i % 4 ], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $alph_point ); ?></li>
-				<?php endforeach; ?>
-			</ul>
+			<?php if ( alph_lines( 'presale_points' ) ) : ?>
+				<ul class="perks">
+					<?php foreach ( alph_lines( 'presale_points' ) as $alph_i => $alph_point ) : ?>
+						<li><span class="perks__icon"><?php echo alph_icon( $alph_icons[ $alph_i % 4 ], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><?php echo esc_html( $alph_point ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
 
 			<?php if ( $alph_percent ) : ?>
 				<div class="progress">

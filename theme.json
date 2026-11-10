@@ -11,32 +11,111 @@
 			"defaultPalette": false,
 			"defaultGradients": false,
 			"palette": [
-				{ "slug": "navy", "name": "Navy", "color": "#1a2180" },
-				{ "slug": "ink", "name": "Ink", "color": "#131735" },
-				{ "slug": "brown", "name": "Brown", "color": "#8a3a14" },
-				{ "slug": "orange", "name": "Orange", "color": "#ffa53d" },
-				{ "slug": "green", "name": "Green", "color": "#2d7a4c" },
-				{ "slug": "cream", "name": "Cream", "color": "#f6f4ef" },
-				{ "slug": "blue-soft", "name": "Soft blue", "color": "#eef1fa" },
-				{ "slug": "lilac", "name": "Lilac", "color": "#e4e6f4" },
-				{ "slug": "white", "name": "White", "color": "#ffffff" },
-				{ "slug": "muted", "name": "Muted text", "color": "#5e6279" }
+				{
+					"slug": "primary",
+					"name": "Primary",
+					"color": "#102178"
+				},
+				{
+					"slug": "sapphire",
+					"name": "Sapphire",
+					"color": "#2b3a8f"
+				},
+				{
+					"slug": "ink",
+					"name": "Ink",
+					"color": "#161a30"
+				},
+				{
+					"slug": "amber",
+					"name": "Amber",
+					"color": "#fda13c"
+				},
+				{
+					"slug": "brown",
+					"name": "Brown",
+					"color": "#8c5000"
+				},
+				{
+					"slug": "success",
+					"name": "Green",
+					"color": "#2d7a58"
+				},
+				{
+					"slug": "paper",
+					"name": "Paper",
+					"color": "#fafaf8"
+				},
+				{
+					"slug": "cream",
+					"name": "Cream",
+					"color": "#f4f3ee"
+				},
+				{
+					"slug": "blue-soft",
+					"name": "Soft blue",
+					"color": "#eef1fa"
+				},
+				{
+					"slug": "gold-soft",
+					"name": "Soft gold",
+					"color": "#fdf6ed"
+				},
+				{
+					"slug": "white",
+					"name": "White",
+					"color": "#ffffff"
+				},
+				{
+					"slug": "muted",
+					"name": "Muted text",
+					"color": "#60647a"
+				}
 			]
 		},
 		"typography": {
 			"fontFamilies": [
-				{ "slug": "serif", "name": "Source Serif 4", "fontFamily": "\"Source Serif 4\", Georgia, serif" },
-				{ "slug": "sans", "name": "DM Sans", "fontFamily": "\"DM Sans\", system-ui, sans-serif" }
+				{
+					"slug": "serif",
+					"name": "Noto Serif",
+					"fontFamily": "\"Noto Serif\", Georgia, serif"
+				},
+				{
+					"slug": "sans",
+					"name": "Plus Jakarta Sans",
+					"fontFamily": "\"Plus Jakarta Sans\", system-ui, sans-serif"
+				}
 			],
 			"fontSizes": [
-				{ "slug": "small", "name": "Small", "size": "14px" },
-				{ "slug": "medium", "name": "Medium", "size": "17px" },
-				{ "slug": "large", "name": "Large", "size": "22px" },
-				{ "slug": "x-large", "name": "Extra large", "size": "32px" }
+				{
+					"slug": "small",
+					"name": "Small",
+					"size": "14px"
+				},
+				{
+					"slug": "medium",
+					"name": "Medium",
+					"size": "17px"
+				},
+				{
+					"slug": "large",
+					"name": "Large",
+					"size": "22px"
+				},
+				{
+					"slug": "x-large",
+					"name": "Extra large",
+					"size": "32px"
+				}
 			]
 		},
 		"spacing": {
-			"units": [ "px", "em", "rem", "%" ]
+			"units": [
+				"px",
+				"em",
+				"rem",
+				"%"
+			]
 		}
 	}
 }

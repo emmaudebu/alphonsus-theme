@@ -11,7 +11,8 @@ $alph_has_wc   = class_exists( 'WooCommerce' );
 $alph_phone    = alph_mod( 'phone' );
 $alph_email    = alph_mod( 'email' );
 $alph_contact  = get_page_by_path( 'contact' );
-$alph_donate   = alph_mod( 'donate_url' );
+$alph_donate   = alph_url( 'donate_url' );
+$alph_ext      = alph_is_external( $alph_donate ) ? ' target="_blank" rel="noopener"' : '';
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -45,9 +46,11 @@ $alph_donate   = alph_mod( 'donate_url' );
 			<?php endif; ?>
 		</ul>
 		<div class="topbar__tools">
-			<?php if ( shortcode_exists( 'psm-multi-currency-switcher' ) ) : ?>
-				<div class="currency"><?php echo do_shortcode( '[psm-multi-currency-switcher size="small" flag="0" name="0" symbol="1" code="1"]' ); ?></div>
-			<?php endif; ?>
+			<?php
+			if ( function_exists( 'alph_currency_button' ) ) {
+				alph_currency_button();
+			}
+			?>
 			<?php if ( $alph_contact ) : ?>
 				<a class="topbar__support" href="<?php echo esc_url( get_permalink( $alph_contact ) ); ?>"><?php esc_html_e( 'Support', 'alphonsus' ); ?></a>
 			<?php endif; ?>
@@ -77,8 +80,9 @@ $alph_donate   = alph_mod( 'donate_url' );
 					<?php echo alph_icon( 'heart', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 					<span class="count-dot wishlist-count<?php echo alph_wishlist_ids() ? '' : ' is-empty'; ?>" data-wishlist-count><?php echo esc_html( count( alph_wishlist_ids() ) ); ?></span>
 				</a>
-				<a class="icon-btn account-link" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>" aria-label="<?php echo is_user_logged_in() ? esc_attr__( 'My account', 'alphonsus' ) : esc_attr__( 'Log in or register', 'alphonsus' ); ?>">
-					<?php echo alph_icon( 'user', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<a class="account-link" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">
+					<span class="account-link__icon"><?php echo alph_icon( 'user', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="account-link__text"><small><?php echo is_user_logged_in() ? esc_html__( 'Reader & parent', 'alphonsus' ) : esc_html__( 'Sign in', 'alphonsus' ); ?></small><strong><?php esc_html_e( 'My Account', 'alphonsus' ); ?></strong></span>
 				</a>
 				<a class="header-cart" href="<?php echo esc_url( wc_get_cart_url() ); ?>">
 					<span class="header-cart__icon"><?php echo alph_icon( 'bag', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo alph_cart_count_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
@@ -86,7 +90,7 @@ $alph_donate   = alph_mod( 'donate_url' );
 				</a>
 			<?php endif; ?>
 			<?php if ( $alph_donate ) : ?>
-				<a class="btn btn--orange btn--sm donate-btn" href="<?php echo esc_url( $alph_donate ); ?>" target="_blank" rel="noopener">
+				<a class="btn btn--amber btn--sm donate-btn" href="<?php echo esc_url( $alph_donate ); ?>"<?php echo $alph_ext; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 					<?php echo alph_icon( 'hand-heart', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span><?php esc_html_e( 'Donate', 'alphonsus' ); ?></span>
 				</a>
 			<?php endif; ?>
@@ -119,7 +123,7 @@ $alph_donate   = alph_mod( 'donate_url' );
 					<div id="google_translate_element" class="translate__panel" hidden></div>
 				</div>
 				<?php if ( $alph_donate ) : ?>
-					<a class="btn btn--orange site-nav__donate" href="<?php echo esc_url( $alph_donate ); ?>" target="_blank" rel="noopener"><?php echo alph_icon( 'hand-heart', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php esc_html_e( 'Donate', 'alphonsus' ); ?></a>
+					<a class="btn btn--amber site-nav__donate" href="<?php echo esc_url( $alph_donate ); ?>"<?php echo $alph_ext; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php echo alph_icon( 'hand-heart', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php esc_html_e( 'Donate', 'alphonsus' ); ?></a>
 				<?php endif; ?>
 			</nav>
 		</div>

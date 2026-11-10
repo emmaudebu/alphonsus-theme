@@ -79,26 +79,6 @@ add_filter(
 	}
 );
 
-/**
- * Category pills above the shop / category archives.
- */
-add_action(
-	'woocommerce_archive_description',
-	function () {
-		echo '<div class="shop-pills">';
-		alph_category_pills();
-		echo '</div>';
-	},
-	20
-);
-
-add_filter(
-	'loop_shop_per_page',
-	function () {
-		return 16;
-	}
-);
-
 add_filter(
 	'woocommerce_output_related_products_args',
 	function ( $args ) {
@@ -190,37 +170,92 @@ function alph_product_badge( WC_Product $product ) {
 /**
  * Add-to-cart (AJAX for simple products) or "View" button for a card.
  */
-function alph_card_button( WC_Product $product ) {
+function alph_card_button( WC_Product $product, $large = false ) {
+	$cls = $large ? 'btn btn--amber' : 'btn-add';
 	if ( $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock() ) {
 		return sprintf(
-			'<a href="%1$s" data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="btn-add add_to_cart_button ajax_add_to_cart product_type_simple" aria-label="%4$s" rel="nofollow">%5$s<span>%6$s</span></a>',
+			'<a href="%1$s" data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="%7$s add_to_cart_button ajax_add_to_cart product_type_simple" aria-label="%4$s" rel="nofollow">%5$s<span>%6$s</span></a>',
 			esc_url( $product->add_to_cart_url() ),
 			$product->get_id(),
 			esc_attr( $product->get_sku() ),
 			esc_attr( $product->add_to_cart_description() ),
 			alph_icon( 'bag', 15 ),
-			esc_html__( 'Add', 'alphonsus' )
+			$large ? esc_html__( 'Add bundle to cart', 'alphonsus' ) : esc_html__( 'Add', 'alphonsus' ),
+			esc_attr( $cls )
 		);
 	}
 	return sprintf(
-		'<a href="%1$s" class="btn-add" aria-label="%2$s">%3$s<span>%4$s</span></a>',
+		'<a href="%1$s" class="%5$s" aria-label="%2$s">%3$s<span>%4$s</span></a>',
 		esc_url( $product->get_permalink() ),
 		/* translators: %s: product name. */
 		esc_attr( sprintf( __( 'View options for %s', 'alphonsus' ), $product->get_name() ) ),
 		alph_icon( 'arrow', 15 ),
-		esc_html__( 'View', 'alphonsus' )
+		esc_html__( 'View', 'alphonsus' ),
+		esc_attr( $cls )
 	);
 }
 
 /**
- * Product card markup (homepage sections, shop loops, wishlist).
+ * Author line for a product ("By …"), falling back to the default author.
  */
-function alph_product_card( WC_Product $product, $heading = 'h3' ) {
+function alph_product_author( WC_Product $product ) {
+	$author = trim( (string) $product->get_meta( '_alph_author' ) );
+	$author = '' !== $author ? $author : (string) alph_mod( 'default_author' );
+	if ( '' === $author ) {
+		return '';
+	}
+	// "A story by Chika…" already reads naturally; plain names get "By".
+	return preg_match( '/\bby\b/i', $author ) ? $author : sprintf( /* translators: %s: author name */ __( 'By %s', 'alphonsus' ), $author );
+}
+
+/**
+ * The most specific category name to show on a card (skips the generic "Books").
+ */
+function alph_product_kicker( WC_Product $product ) {
+	$terms = get_the_terms( $product->get_id(), 'product_cat' );
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		return '';
+	}
+	foreach ( $terms as $term ) {
+		if ( 'books' !== $term->slug ) {
+			return $term->name;
+		}
+	}
+	return $terms[0]->name;
+}
+
+/**
+ * Compact rating for cards — only when there are real reviews.
+ */
+function alph_rating_mini( WC_Product $product ) {
+	$count = $product->get_rating_count();
+	if ( ! $count ) {
+		return '';
+	}
+	return sprintf(
+		'<span class="rating-mini" aria-label="%1$s">%2$s<strong>%3$s</strong><small>(%4$d)</small></span>',
+		/* translators: 1: average rating, 2: review count */
+		esc_attr( sprintf( __( 'Rated %1$s out of 5 from %2$d reviews', 'alphonsus' ), number_format_i18n( (float) $product->get_average_rating(), 1 ), $count ) ),
+		alph_icon( 'star', 13 ),
+		esc_html( number_format_i18n( (float) $product->get_average_rating(), 2 ) ),
+		(int) $count
+	);
+}
+
+/**
+ * Product card markup (homepage sections, shop loops, page grids, wishlist).
+ *
+ * @param WC_Product $product Product.
+ * @param string     $heading h2 or h3.
+ * @param array      $opts    excerpt (bool): show a short description line.
+ */
+function alph_product_card( WC_Product $product, $heading = 'h3', array $opts = array() ) {
 	$badge  = alph_product_badge( $product );
-	$author = (string) $product->get_meta( '_alph_author' );
-	$author = '' !== $author ? $author : alph_mod( 'default_author' );
+	$author = alph_product_author( $product );
+	$kicker = alph_product_kicker( $product );
 	$url    = $product->get_permalink();
 	$tag    = in_array( $heading, array( 'h2', 'h3' ), true ) ? $heading : 'h3';
+	$text   = ! empty( $opts['excerpt'] ) ? wp_trim_words( wp_strip_all_tags( $product->get_short_description() ? $product->get_short_description() : $product->get_description() ), 14 ) : '';
 	?>
 	<article class="card product-card<?php echo $product->is_on_sale() ? ' is-sale' : ''; ?>">
 		<div class="product-card__media">
@@ -233,17 +268,47 @@ function alph_product_card( WC_Product $product, $heading = 'h3' ) {
 			<?php echo alph_wishlist_button( $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		</div>
 		<div class="product-card__body">
+			<?php if ( $kicker || $product->get_rating_count() ) : ?>
+				<div class="product-card__meta"><span><?php echo esc_html( $kicker ); ?></span><?php echo alph_rating_mini( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+			<?php endif; ?>
+			<<?php echo esc_html( $tag ); ?> class="product-card__title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></<?php echo esc_html( $tag ); ?>>
 			<?php if ( $author ) : ?>
 				<p class="product-card__author"><?php echo esc_html( $author ); ?></p>
 			<?php endif; ?>
-			<<?php echo esc_html( $tag ); ?> class="product-card__title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></<?php echo esc_html( $tag ); ?>>
-			<?php echo alph_stars( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<?php if ( $text ) : ?>
+				<p class="product-card__text"><?php echo esc_html( $text ); ?></p>
+			<?php endif; ?>
 			<div class="product-card__foot">
 				<span class="price"><?php echo $product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 				<?php echo alph_card_button( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			</div>
 		</div>
 	</article>
+	<?php
+}
+
+/**
+ * Bundle spotlight banner (Wellness and Merch pages).
+ */
+function alph_bundle_spotlight( WC_Product $product ) {
+	$regular = (float) $product->get_regular_price();
+	$price   = (float) $product->get_price();
+	$save    = $product->is_on_sale() && $regular > 0 ? round( ( $regular - $price ) / $regular * 100 ) : 0;
+	?>
+	<div class="spotlight">
+		<div class="spotlight__copy">
+			<span class="chip chip--paper"><?php echo alph_icon( 'gift', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $save ? sprintf( /* translators: %d: percent */ __( 'Bundle offer • Save %d%%', 'alphonsus' ), $save ) : __( 'Bundle offer', 'alphonsus' ) ); ?></span>
+			<h2 class="shead__title"><a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></h2>
+			<?php if ( $product->get_short_description() ) : ?>
+				<p class="shead__text"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $product->get_short_description() ), 40 ) ); ?></p>
+			<?php endif; ?>
+			<div class="spotlight__buy">
+				<span class="price price--lg"><?php echo $product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<?php echo alph_card_button( $product, true ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			</div>
+		</div>
+		<a class="spotlight__media" href="<?php echo esc_url( $product->get_permalink() ); ?>" tabindex="-1" aria-hidden="true"><?php echo $product->get_image( 'large', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+	</div>
 	<?php
 }
 
@@ -356,21 +421,8 @@ add_filter(
 );
 
 /*
- * Single product tweaks.
+ * Single product.
  */
-add_action(
-	'woocommerce_single_product_summary',
-	function () {
-		global $product;
-		$author = $product ? (string) $product->get_meta( '_alph_author' ) : '';
-		$author = '' !== $author ? $author : alph_mod( 'default_author' );
-		if ( $author ) {
-			echo '<p class="product-author">' . esc_html( $author ) . '</p>';
-		}
-	},
-	4
-);
-
 add_action(
 	'woocommerce_after_add_to_cart_button',
 	function () {
@@ -381,13 +433,24 @@ add_action(
 	}
 );
 
-add_action(
-	'woocommerce_single_product_summary',
+add_filter(
+	'woocommerce_product_related_products_heading',
 	function () {
-		echo '<ul class="trust-list">';
-		echo '<li>' . alph_icon( 'truck', 18 ) . esc_html__( 'Worldwide delivery available', 'alphonsus' ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput
-		echo '<li>' . alph_icon( 'shield', 18 ) . esc_html__( 'Secure checkout with Paystack', 'alphonsus' ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput
-		echo '</ul>';
+		return __( 'Curated Companions', 'alphonsus' );
+	}
+);
+
+add_filter(
+	'loop_shop_columns',
+	function () {
+		return 3;
+	}
+);
+
+add_filter(
+	'loop_shop_per_page',
+	function () {
+		return 12;
 	},
-	35
+	20
 );

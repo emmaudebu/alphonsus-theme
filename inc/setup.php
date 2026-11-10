@@ -91,7 +91,7 @@ add_action(
 add_action(
 	'wp_head',
 	function () {
-		foreach ( array( 'source-serif.woff2', 'dm-sans.woff2' ) as $font ) {
+		foreach ( array( 'noto-serif.woff2', 'plus-jakarta-sans.woff2' ) as $font ) {
 			printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n", esc_url( ALPH_URI . '/assets/fonts/' . $font ) );
 		}
 	},

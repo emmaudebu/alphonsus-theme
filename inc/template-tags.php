@@ -146,6 +146,8 @@ function alph_form_notice( $form ) {
 			'preorder'   => __( 'Thank you! Your pre-order request has been received. We will contact you shortly to confirm.', 'alphonsus' ),
 			'contact'    => __( 'Thank you! Your message has been sent. We usually reply within one working day.', 'alphonsus' ),
 			'newsletter' => __( 'You’re in! Welcome to the young readers & language learners club.', 'alphonsus' ),
+			'enrol'      => __( 'Thank you! Your enrolment request has been received. We will contact you to confirm your level, schedule and fees.', 'alphonsus' ),
+			'volunteer'  => __( 'Thank you for offering to help! Our foundation team will be in touch shortly.', 'alphonsus' ),
 		);
 		echo '<div class="notice notice--success" role="status">' . alph_icon( 'check', 18 ) . esc_html( $messages[ $form ] ?? __( 'Thank you!', 'alphonsus' ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	} elseif ( isset( $_GET['alph_error'] ) && $form === $_GET['alph_error'] ) {
