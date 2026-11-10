@@ -1,0 +1,393 @@
+<?php
+/**
+ * WooCommerce integration.
+ *
+ * @package Alphonsus
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+add_action(
+	'after_setup_theme',
+	function () {
+		add_theme_support(
+			'woocommerce',
+			array(
+				'thumbnail_image_width' => 480,
+				'single_image_width'    => 720,
+				'product_grid'          => array(
+					'default_columns' => 4,
+					'default_rows'    => 4,
+					'min_columns'     => 2,
+					'max_columns'     => 4,
+				),
+			)
+		);
+		add_theme_support( 'wc-product-gallery-zoom' );
+		add_theme_support( 'wc-product-gallery-lightbox' );
+		add_theme_support( 'wc-product-gallery-slider' );
+	}
+);
+
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
+			wp_enqueue_script( 'wc-add-to-cart' );
+		}
+	}
+);
+
+// Only the layout-neutral WooCommerce stylesheet; the theme styles the rest.
+add_filter(
+	'woocommerce_enqueue_styles',
+	function ( $styles ) {
+		unset( $styles['woocommerce-layout'], $styles['woocommerce-smallscreen'] );
+		return $styles;
+	}
+);
+
+/*
+ * Page wrappers.
+ */
+remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
+remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );
+remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
+
+add_action(
+	'woocommerce_before_main_content',
+	function () {
+		echo '<main id="main" class="site-main shop-main"><div class="container">';
+	},
+	10
+);
+add_action(
+	'woocommerce_after_main_content',
+	function () {
+		echo '</div></main>';
+	},
+	10
+);
+
+add_filter(
+	'woocommerce_breadcrumb_defaults',
+	function ( $args ) {
+		$args['delimiter']   = '<span class="sep" aria-hidden="true">/</span>';
+		$args['wrap_before'] = '<nav class="breadcrumb" aria-label="' . esc_attr__( 'Breadcrumb', 'alphonsus' ) . '">';
+		$args['wrap_after']  = '</nav>';
+		return $args;
+	}
+);
+
+/**
+ * Category pills above the shop / category archives.
+ */
+add_action(
+	'woocommerce_archive_description',
+	function () {
+		echo '<div class="shop-pills">';
+		alph_category_pills();
+		echo '</div>';
+	},
+	20
+);
+
+add_filter(
+	'loop_shop_per_page',
+	function () {
+		return 16;
+	}
+);
+
+add_filter(
+	'woocommerce_output_related_products_args',
+	function ( $args ) {
+		$args['posts_per_page'] = 4;
+		$args['columns']        = 4;
+		return $args;
+	}
+);
+
+add_filter(
+	'woocommerce_upsell_display_args',
+	function ( $args ) {
+		$args['columns'] = 4;
+		return $args;
+	}
+);
+
+/*
+ * Product card fields: author line and corner badge.
+ */
+add_action(
+	'woocommerce_product_options_general_product_data',
+	function () {
+		echo '<div class="options_group">';
+		woocommerce_wp_text_input(
+			array(
+				'id'          => '_alph_author',
+				'label'       => __( 'Author line', 'alphonsus' ),
+				'description' => __( 'Shown above the title on product cards, e.g. "A story by Chika Alphonsus". Leave blank to use the default author.', 'alphonsus' ),
+				'desc_tip'    => true,
+			)
+		);
+		woocommerce_wp_text_input(
+			array(
+				'id'          => '_alph_badge',
+				'label'       => __( 'Card badge', 'alphonsus' ),
+				'description' => __( 'Small label on the product image, e.g. "Ages 4–8", "Beginner A1", "Staff Pick". Sale items show "Sale" automatically.', 'alphonsus' ),
+				'desc_tip'    => true,
+			)
+		);
+		echo '</div>';
+	}
+);
+
+add_action(
+	'woocommerce_admin_process_product_object',
+	function ( WC_Product $product ) {
+		foreach ( array( '_alph_author', '_alph_badge' ) as $key ) {
+			if ( isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- WooCommerce verifies the product form nonce.
+				$product->update_meta_data( $key, sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
+			}
+		}
+	}
+);
+
+/**
+ * Star rating, only when the product has real reviews.
+ */
+function alph_stars( WC_Product $product ) {
+	$count = $product->get_rating_count();
+	if ( ! $count ) {
+		return '';
+	}
+	$avg = (float) $product->get_average_rating();
+	/* translators: 1: average rating, 2: number of reviews. */
+	$label = sprintf( _n( 'Rated %1$s out of 5 from %2$d review', 'Rated %1$s out of 5 from %2$d reviews', $count, 'alphonsus' ), number_format_i18n( $avg, 1 ), $count );
+	return sprintf(
+		'<div class="stars" role="img" aria-label="%1$s"><span class="stars__track"><span class="stars__fill" style="width:%2$s%%"></span></span><span class="stars__count">(%3$d)</span></div>',
+		esc_attr( $label ),
+		esc_attr( round( $avg / 5 * 100 ) ),
+		(int) $count
+	);
+}
+
+/**
+ * Badge text for a product card.
+ */
+function alph_product_badge( WC_Product $product ) {
+	$badge = (string) $product->get_meta( '_alph_badge' );
+	if ( '' === $badge && $product->is_on_sale() ) {
+		$badge = __( 'Sale', 'alphonsus' );
+	}
+	if ( ! $product->is_in_stock() ) {
+		$badge = __( 'Sold out', 'alphonsus' );
+	}
+	return $badge;
+}
+
+/**
+ * Add-to-cart (AJAX for simple products) or "View" button for a card.
+ */
+function alph_card_button( WC_Product $product ) {
+	if ( $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock() ) {
+		return sprintf(
+			'<a href="%1$s" data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="btn-add add_to_cart_button ajax_add_to_cart product_type_simple" aria-label="%4$s" rel="nofollow">%5$s<span>%6$s</span></a>',
+			esc_url( $product->add_to_cart_url() ),
+			$product->get_id(),
+			esc_attr( $product->get_sku() ),
+			esc_attr( $product->add_to_cart_description() ),
+			alph_icon( 'bag', 15 ),
+			esc_html__( 'Add', 'alphonsus' )
+		);
+	}
+	return sprintf(
+		'<a href="%1$s" class="btn-add" aria-label="%2$s">%3$s<span>%4$s</span></a>',
+		esc_url( $product->get_permalink() ),
+		/* translators: %s: product name. */
+		esc_attr( sprintf( __( 'View options for %s', 'alphonsus' ), $product->get_name() ) ),
+		alph_icon( 'arrow', 15 ),
+		esc_html__( 'View', 'alphonsus' )
+	);
+}
+
+/**
+ * Product card markup (homepage sections, shop loops, wishlist).
+ */
+function alph_product_card( WC_Product $product, $heading = 'h3' ) {
+	$badge  = alph_product_badge( $product );
+	$author = (string) $product->get_meta( '_alph_author' );
+	$author = '' !== $author ? $author : alph_mod( 'default_author' );
+	$url    = $product->get_permalink();
+	$tag    = in_array( $heading, array( 'h2', 'h3' ), true ) ? $heading : 'h3';
+	?>
+	<article class="card product-card<?php echo $product->is_on_sale() ? ' is-sale' : ''; ?>">
+		<div class="product-card__media">
+			<a href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
+				<?php echo $product->get_image( 'woocommerce_thumbnail', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			</a>
+			<?php if ( $badge ) : ?>
+				<span class="badge badge--<?php echo esc_attr( alph_badge_tone( $badge ) ); ?>"><?php echo esc_html( $badge ); ?></span>
+			<?php endif; ?>
+			<?php echo alph_wishlist_button( $product->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		</div>
+		<div class="product-card__body">
+			<?php if ( $author ) : ?>
+				<p class="product-card__author"><?php echo esc_html( $author ); ?></p>
+			<?php endif; ?>
+			<<?php echo esc_html( $tag ); ?> class="product-card__title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></<?php echo esc_html( $tag ); ?>>
+			<?php echo alph_stars( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<div class="product-card__foot">
+				<span class="price"><?php echo $product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<?php echo alph_card_button( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			</div>
+		</div>
+	</article>
+	<?php
+}
+
+/**
+ * Pick a badge colour from its wording so badges vary like the design.
+ */
+function alph_badge_tone( $badge ) {
+	$b = strtolower( $badge );
+	if ( preg_match( '/sale|sold|limited|hot/', $b ) ) {
+		return 'red';
+	}
+	if ( preg_match( '/pick|new|self|care|health/', $b ) ) {
+		return 'green';
+	}
+	if ( preg_match( '/age|beginner|vol|best/', $b ) ) {
+		return 'brown';
+	}
+	if ( preg_match( '/travel|guide/', $b ) ) {
+		return 'light';
+	}
+	return 'navy';
+}
+
+/**
+ * Products for a homepage section: pinned IDs first, then fill from category.
+ *
+ * @return WC_Product[]
+ */
+function alph_section_products( $category, $ids = '', $limit = 4 ) {
+	$products = array();
+	$pinned   = array_filter( array_map( 'absint', explode( ',', (string) $ids ) ) );
+
+	foreach ( $pinned as $id ) {
+		$product = wc_get_product( $id );
+		if ( $product && 'publish' === $product->get_status() && $product->is_visible() ) {
+			$products[ $id ] = $product;
+		}
+	}
+
+	if ( count( $products ) < $limit && $category ) {
+		$more = wc_get_products(
+			array(
+				'status'     => 'publish',
+				'visibility' => 'catalog',
+				'category'   => array( $category ),
+				'limit'      => $limit,
+				'exclude'    => array_keys( $products ),
+				'orderby'    => 'date',
+				'order'      => 'DESC',
+			)
+		);
+		foreach ( $more as $product ) {
+			$products[ $product->get_id() ] = $product;
+		}
+	}
+
+	return array_slice( $products, 0, $limit );
+}
+
+/**
+ * URL for a product category slug (or pass through a URL).
+ */
+function alph_term_url( $slug_or_url ) {
+	if ( preg_match( '#^(https?:)?/#', $slug_or_url ) ) {
+		return 0 === strpos( $slug_or_url, '/' ) && 0 !== strpos( $slug_or_url, '//' ) ? home_url( $slug_or_url ) : $slug_or_url;
+	}
+	$term = get_term_by( 'slug', $slug_or_url, 'product_cat' );
+	return $term ? get_term_link( $term ) : home_url( '/' );
+}
+
+/**
+ * Category pill links; the current category is highlighted.
+ */
+function alph_category_pills() {
+	$current = is_product_category() ? get_queried_object()->slug : ( is_shop() ? 'books' : '' );
+	echo '<nav class="pills" aria-label="' . esc_attr__( 'Book categories', 'alphonsus' ) . '">';
+	foreach ( alph_lines( 'pills', true ) as $pill ) {
+		list( $label, $target ) = $pill;
+		$active                 = $target === $current || ( is_front_page() && 'books' === $target );
+		printf(
+			'<a class="pill%1$s" href="%2$s"%3$s>%4$s</a>',
+			$active ? ' is-active' : '',
+			esc_url( alph_term_url( $target ) ),
+			$active ? ' aria-current="page"' : '',
+			esc_html( $label )
+		);
+	}
+	echo '</nav>';
+}
+
+/*
+ * Header cart count + total, refreshed by WooCommerce cart fragments.
+ */
+function alph_cart_count_html() {
+	$count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0;
+	return '<span class="count-dot cart-count' . ( $count ? '' : ' is-empty' ) . '">' . esc_html( $count ) . '</span>';
+}
+
+function alph_cart_total_html() {
+	return '<span class="cart-total">' . ( WC()->cart ? WC()->cart->get_cart_subtotal() : wc_price( 0 ) ) . '</span>';
+}
+
+add_filter(
+	'woocommerce_add_to_cart_fragments',
+	function ( $fragments ) {
+		$fragments['span.cart-count'] = alph_cart_count_html();
+		$fragments['span.cart-total'] = alph_cart_total_html();
+		return $fragments;
+	}
+);
+
+/*
+ * Single product tweaks.
+ */
+add_action(
+	'woocommerce_single_product_summary',
+	function () {
+		global $product;
+		$author = $product ? (string) $product->get_meta( '_alph_author' ) : '';
+		$author = '' !== $author ? $author : alph_mod( 'default_author' );
+		if ( $author ) {
+			echo '<p class="product-author">' . esc_html( $author ) . '</p>';
+		}
+	},
+	4
+);
+
+add_action(
+	'woocommerce_after_add_to_cart_button',
+	function () {
+		global $product;
+		if ( $product ) {
+			echo alph_wishlist_button( $product->get_id(), true ); // phpcs:ignore WordPress.Security.EscapeOutput
+		}
+	}
+);
+
+add_action(
+	'woocommerce_single_product_summary',
+	function () {
+		echo '<ul class="trust-list">';
+		echo '<li>' . alph_icon( 'truck', 18 ) . esc_html__( 'Worldwide delivery available', 'alphonsus' ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput
+		echo '<li>' . alph_icon( 'shield', 18 ) . esc_html__( 'Secure checkout with Paystack', 'alphonsus' ) . '</li>'; // phpcs:ignore WordPress.Security.EscapeOutput
+		echo '</ul>';
+	},
+	35
+);
