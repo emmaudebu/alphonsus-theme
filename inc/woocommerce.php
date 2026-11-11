@@ -463,3 +463,79 @@ add_filter(
 	},
 	20
 );
+
+/*
+ * WooCommerce product-grid blocks (e.g. "New in store" in the empty cart)
+ * render the theme's product cards instead of the plain block grid.
+ */
+foreach ( array( 'product-new', 'product-best-sellers', 'product-on-sale', 'product-top-rated', 'product-category' ) as $alph_block ) {
+	add_filter(
+		'render_block_woocommerce/' . $alph_block,
+		function ( $html, $block ) use ( $alph_block ) {
+			$attrs = $block['attrs'] ?? array();
+			$limit = max( 1, (int) ( $attrs['columns'] ?? 4 ) * (int) ( $attrs['rows'] ?? 1 ) );
+			$args  = array(
+				'status'     => 'publish',
+				'visibility' => 'catalog',
+				'limit'      => $limit,
+				'exclude'    => array( (int) get_option( 'alph_donation_product' ) ),
+			);
+			if ( ! empty( $attrs['categories'] ) ) {
+				$args['category'] = array_filter( array_map( fn( $id ) => ( $t = get_term( (int) $id, 'product_cat' ) ) && ! is_wp_error( $t ) ? $t->slug : '', (array) $attrs['categories'] ) );
+			}
+			switch ( $alph_block ) {
+				case 'product-best-sellers':
+					$args['orderby']  = 'meta_value_num';
+					$args['meta_key'] = 'total_sales'; // phpcs:ignore WordPress.DB.SlowDBQuery
+					$args['order']    = 'DESC';
+					break;
+				case 'product-on-sale':
+					$args['include'] = wc_get_product_ids_on_sale();
+					if ( ! $args['include'] ) {
+						return '';
+					}
+					break;
+				case 'product-top-rated':
+					$args['orderby']  = 'meta_value_num';
+					$args['meta_key'] = '_wc_average_rating'; // phpcs:ignore WordPress.DB.SlowDBQuery
+					$args['order']    = 'DESC';
+					break;
+				default:
+					$args['orderby'] = 'date';
+					$args['order']   = 'DESC';
+			}
+			$products = wc_get_products( $args );
+			if ( ! $products ) {
+				return $html;
+			}
+			ob_start();
+			echo '<div class="alph-block-grid">';
+			alph_product_grid( $products, min( 4, max( 2, (int) ( $attrs['columns'] ?? 4 ) ) ) );
+			echo '</div>';
+			return ob_get_clean();
+		},
+		10,
+		2
+	);
+}
+
+/**
+ * Empty cart: friendlier message and next steps under the title.
+ */
+add_filter(
+	'render_block_woocommerce/empty-cart-block',
+	function ( $html ) {
+		$wish  = function_exists( 'alph_wishlist_ids' ) ? count( alph_wishlist_ids() ) : 0;
+		$extra = '<p class="empty-cart__text">' . esc_html__( 'Looks like you haven’t added any books yet. Explore story books, Swedish courses and wellness guides — or pick up where you left off.', 'alphonsus' ) . '</p>';
+		$extra .= '<div class="empty-cart__actions">';
+		$extra .= '<a class="btn btn--primary" href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '">' . alph_icon( 'book-open', 17 ) . '<span>' . esc_html__( 'Browse the book shop', 'alphonsus' ) . '</span></a>';
+		if ( $wish && function_exists( 'alph_wishlist_page_url' ) ) {
+			/* translators: %d: number of saved books */
+			$extra .= '<a class="btn btn--ghost" href="' . esc_url( alph_wishlist_page_url() ) . '">' . alph_icon( 'heart', 17 ) . '<span>' . esc_html( sprintf( _n( 'View wishlist (%d)', 'View wishlist (%d)', $wish, 'alphonsus' ), $wish ) ) . '</span></a>';
+		}
+		$extra .= '</div>';
+		// Insert right after the first heading (the "cart is empty" title).
+		$pos = strpos( $html, '</h2>' );
+		return false === $pos ? $html : substr_replace( $html, '</h2>' . $extra, $pos, 5 );
+	}
+);
