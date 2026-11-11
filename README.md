@@ -19,7 +19,7 @@ Paystack (or any WooCommerce payment gateway) handles checkout, including founda
 
 1. Copy this folder to `wp-content/themes/alphonsus` (or install the zip from **Appearance → Themes → Add New → Upload**).
 2. Activate the theme. On activation it:
-   - creates the **About Us, Foundation, Contact, Swedish School, Wellness and Merch** pages if they're missing, and assigns their templates;
+   - creates the **About Us, Foundation, Contact, Swedish School, Wellness, Merch, Wishlist, Sign In and Create Account** pages if they're missing, and assigns their templates;
    - registers the product attributes used by the shop filters: `level`, `language`, `age-range` and `format`;
    - creates a hidden **Foundation donation** product;
    - flushes permalinks for the *Reading Journey* account page.
@@ -55,6 +55,7 @@ Product star ratings only appear when a product has real WooCommerce reviews.
 | My Account | Welcome header with stats, icon menu, dashboard with reading summary, order tracking steps, enrolment requests, addresses and recommendations | `woocommerce/myaccount/`, `inc/account.php` |
 | Reading Journey | Reading timer, offline log, daily goal ring, streaks, XP and levels, weekly chart, daily quests, book progress sliders, subject-mix donut, achievements, CSV export. Stored per customer in user meta | `inc/reading.php`, `template-parts/account/reading-journey.php` |
 | Forms | Pre-order, contact, newsletter, Swedish School enrolment and foundation volunteer. Each is emailed and saved to **Form entries** in the admin (filter and CSV export included). Nonce, honeypot, per-IP rate limit and allow-listed choices | `inc/forms.php` |
+| Sign in & registration | `/login/` and `/register/` pages plus restyled My Account sign-in, forgot-password and reset-password screens: brand panel, tabs, show/hide password, strength meter, first name and newsletter opt-in. Forms post to WooCommerce's handlers, so security plugins keep working. Needs *Allow customers to create an account on the My account page* turned on | `inc/auth.php`, `template-parts/auth/`, `woocommerce/myaccount/form-*.php` |
 | Wishlist | Heart toggle on every card; cookie for guests, synced to the account for logged-in customers. Use the `[alphonsus_wishlist]` shortcode on the wishlist page | `inc/wishlist.php` |
 | Search | Header search with category select and live suggestions (REST) | `inc/search.php` |
 | Currency picker | Modal listing the Multi-Currency plugin's enabled currencies and rates; sets the plugin's cookie | `inc/currency.php` |

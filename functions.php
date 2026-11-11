@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ALPH_VERSION', '2.1.0' );
+define( 'ALPH_VERSION', '2.2.0' );
 define( 'ALPH_DIR', get_template_directory() );
 define( 'ALPH_URI', get_template_directory_uri() );
 
@@ -30,4 +30,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	require ALPH_DIR . '/inc/donations.php';
 	require ALPH_DIR . '/inc/reading.php';
 	require ALPH_DIR . '/inc/account.php';
+	require ALPH_DIR . '/inc/auth.php';
 }

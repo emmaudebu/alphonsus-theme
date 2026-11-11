@@ -400,6 +400,21 @@
 		}
 	} );
 
+	/* Show / hide password ------------------------------------------- */
+
+	document.addEventListener( 'click', function ( e ) {
+		var t = e.target.closest( '[data-pw-toggle]' );
+		if ( ! t ) {
+			return;
+		}
+		var input = t.parentNode.querySelector( 'input' );
+		var show = 'password' === input.type;
+		input.type = show ? 'text' : 'password';
+		t.setAttribute( 'aria-pressed', show ? 'true' : 'false' );
+		t.setAttribute( 'aria-label', show ? ( i18n.hidePw || 'Hide password' ) : ( i18n.showPw || 'Show password' ) );
+		input.focus();
+	} );
+
 	/* Currency picker ----------------------------------------------- */
 
 	var currencyModal = document.getElementById( 'currency-modal' );

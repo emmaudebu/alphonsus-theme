@@ -83,7 +83,7 @@ $alph_ext      = alph_is_external( $alph_donate ) ? ' target="_blank" rel="noope
 					<?php echo alph_icon( 'heart', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 					<span class="count-dot wishlist-count<?php echo alph_wishlist_ids() ? '' : ' is-empty'; ?>" data-wishlist-count><?php echo esc_html( count( alph_wishlist_ids() ) ); ?></span>
 				</a>
-				<a class="account-link" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">
+				<a class="account-link" href="<?php echo esc_url( is_user_logged_in() || ! function_exists( 'alph_auth_url' ) ? wc_get_page_permalink( 'myaccount' ) : alph_auth_url( 'login' ) ); ?>">
 					<span class="account-link__icon"><?php echo alph_icon( 'user', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 					<span class="account-link__text"><small><?php echo is_user_logged_in() ? esc_html__( 'Reader & parent', 'alphonsus' ) : esc_html__( 'Sign in', 'alphonsus' ); ?></small><strong><?php esc_html_e( 'My Account', 'alphonsus' ); ?></strong></span>
 				</a>

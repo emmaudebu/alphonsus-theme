@@ -23,6 +23,8 @@ function alph_install() {
 		'wellness'       => array( __( 'Wellness', 'alphonsus' ), 'page-templates/wellness.php' ),
 		'merch'          => array( __( 'Merch', 'alphonsus' ), 'page-templates/merch.php' ),
 		'wishlist'       => array( __( 'Wishlist', 'alphonsus' ), 'page-templates/wishlist.php' ),
+		'login'          => array( __( 'Sign In', 'alphonsus' ), 'page-templates/login.php' ),
+		'register'       => array( __( 'Create Account', 'alphonsus' ), 'page-templates/register.php' ),
 	);
 	foreach ( $pages as $slug => $page ) {
 		$existing = get_page_by_path( $slug );

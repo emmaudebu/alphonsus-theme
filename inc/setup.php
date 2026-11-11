@@ -77,6 +77,8 @@ add_action(
 					'noResults' => __( 'No books found. Press Enter to search the shop.', 'alphonsus' ),
 					'viewAll'   => __( 'See all results', 'alphonsus' ),
 					'ended'     => __( 'Offer ended', 'alphonsus' ),
+					'showPw'    => __( 'Show password', 'alphonsus' ),
+					'hidePw'    => __( 'Hide password', 'alphonsus' ),
 				),
 			)
 		);

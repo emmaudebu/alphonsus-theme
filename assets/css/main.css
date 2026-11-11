@@ -1443,6 +1443,95 @@ ul.products li.product { width: auto !important; margin: 0 !important; float: no
 	.wl-recs { margin-top: 44px; }
 }
 
+/* Sign in / Create account ---------------------------------------------------- */
+
+.page-auth > .container { padding-top: 40px; }
+.woocommerce-account:not(.logged-in) .page-hero { display: none; }
+.woocommerce-account:not(.logged-in) .site-main > .container { padding-top: 40px; }
+.auth { position: relative; display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); max-width: 1080px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-xl); box-shadow: var(--e2); overflow: hidden; }
+.auth__brand { position: relative; display: flex; flex-direction: column; gap: 28px; padding: 48px 44px; color: #dfe2ff; background: radial-gradient(90% 70% at 100% 0%, #3e52a3 0%, transparent 60%), linear-gradient(160deg, var(--sapphire) 0%, var(--primary) 100%); overflow: hidden; }
+.auth__brand::before, .auth__brand::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+.auth__brand::before { width: 320px; height: 320px; right: -140px; bottom: -120px; border: 40px solid rgba(253, 161, 60, .14); }
+.auth__brand::after { width: 140px; height: 140px; left: -50px; bottom: 90px; background: rgba(255, 255, 255, .05); }
+.auth__brand-top { position: relative; }
+.auth__brand .chip { margin-bottom: 18px; }
+.auth__brand-title { font-family: var(--serif); font-size: clamp(26px, 2.6vw, 34px); line-height: 1.2; font-weight: 600; color: #fff; margin: 0 0 12px; }
+.auth__brand-text { margin: 0; font-size: 15px; color: #c9d0ff; }
+.auth__perks { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.auth__perks li { display: flex; align-items: flex-start; gap: 14px; }
+.auth__perks strong { display: block; color: #fff; font-size: 15px; }
+.auth__perks small { display: block; font-size: 13px; color: #c9d0ff; line-height: 1.45; }
+.auth__perk-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--r-md); background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .16); color: var(--amber); flex: none; }
+.auth__motto { position: relative; margin: auto 0 0; font-family: var(--serif); font-style: italic; font-size: 17px; color: #fff; opacity: .9; }
+.auth__card { padding: 44px 52px 40px; min-width: 0; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 30px; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; }
+.auth-tabs__tab { display: grid; place-items: center; min-height: 42px; border-radius: 999px; font-size: 14.5px; font-weight: 700; color: var(--muted); text-decoration: none; transition: .2s; }
+.auth-tabs__tab:hover { color: var(--sapphire); }
+.auth-tabs__tab.is-active { background: var(--card); color: var(--sapphire); box-shadow: var(--e1), 0 0 0 1px var(--line); }
+.auth__head { margin-bottom: 24px; }
+.auth__head--center { text-align: center; }
+.auth__head--center .auth__badge { margin-left: auto; margin-right: auto; }
+.entry-content .auth .auth__title, .auth__title { font-size: clamp(26px, 2.6vw, 32px); color: var(--primary); margin: 0 0 6px; }
+.auth__sub { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.auth__badge { display: grid; place-items: center; width: 54px; height: 54px; margin-bottom: 16px; border-radius: 50%; background: var(--lilac); color: var(--sapphire); }
+.auth__badge--green { background: var(--success-soft); color: var(--success); }
+.entry-content .auth { font-size: 15.5px; line-height: 1.6; }
+.entry-content .auth h1, .entry-content .auth h2 { margin-top: 0; }
+.auth-form .field { margin-bottom: 18px; }
+.input-icon, .pw { position: relative; display: block; }
+.input-icon > .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.auth-form input[type="text"], .auth-form input[type="email"], .auth-form input[type="password"] { width: 100%; height: 50px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: #fff; font-size: 15px; transition: border-color .2s, box-shadow .2s; }
+.input-icon input { padding-left: 42px !important; }
+.pw input { padding-right: 50px !important; }
+.auth-form input:focus { outline: 0; border-color: var(--sapphire); box-shadow: 0 0 0 4px rgba(43, 58, 143, .14); }
+.pw__toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--muted); cursor: pointer; }
+.pw__toggle:hover { background: var(--blue-soft); color: var(--sapphire); }
+.pw__toggle[aria-pressed="true"] { color: var(--sapphire); }
+.pw__toggle[aria-pressed="true"]::after { content: ""; position: absolute; width: 20px; height: 1.8px; background: currentColor; transform: rotate(-45deg); border-radius: 2px; }
+.field__hint { margin: -10px 0 18px; font-size: 12.5px; color: var(--muted); }
+.field__hint--box { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 12px 14px; background: var(--blue-soft); border-radius: var(--r-md); color: #454651; }
+.auth-form__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: -4px 0 22px; }
+.checkline { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.checkline input { width: 18px; height: 18px; accent-color: var(--sapphire); flex: none; margin: 0; }
+.checkline--box { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 14px 16px; margin-bottom: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-md); transition: border-color .2s, background .2s; }
+.checkline--box:has(input:checked) { border-color: var(--sapphire); background: #f3f4fc; }
+.checkline--box input { margin-top: 2px; }
+.checkline--box strong { display: block; font-size: 14px; color: var(--ink); }
+.checkline--box small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.auth-form__link { font-size: 14px; font-weight: 600; text-decoration: none; }
+.auth-form__privacy { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+.auth-form__privacy p { margin: 0 0 16px; }
+.auth-form__submit { min-height: 52px; font-size: 16px; margin-top: 4px; }
+.auth__switch { margin: 22px 0 0; text-align: center; font-size: 14.5px; color: var(--muted); }
+.auth__switch a { font-weight: 700; text-decoration: none; }
+.auth .woocommerce-error, .auth .woocommerce-message, .auth .woocommerce-info { font-size: 14px; }
+.auth .woocommerce-error li { list-style: none; }
+.woocommerce-password-strength { margin-top: 8px; padding: 6px 12px; border-radius: var(--r-sm); font-size: 12.5px; font-weight: 700; text-align: left; border: 0 !important; }
+.woocommerce-password-strength.short { background: var(--discount-soft); color: var(--discount); }
+.woocommerce-password-strength.bad { background: #fff1e3; color: var(--brown); }
+.woocommerce-password-strength.good { background: var(--blue-soft); color: var(--sapphire); }
+.woocommerce-password-strength.strong { background: var(--success-soft); color: var(--success); }
+.woocommerce-password-hint { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 900px) {
+	.auth { grid-template-columns: minmax(0, 1fr); max-width: 560px; }
+	.auth__card { order: -1; padding: 32px 28px; }
+	.auth__brand { padding: 32px 28px; gap: 20px; }
+	.auth__brand-title { font-size: 24px; }
+	.auth__perks { grid-template-columns: 1fr 1fr; gap: 14px; }
+	.auth__motto { margin-top: 4px; }
+}
+
+@media (max-width: 560px) {
+	.page-auth > .container, .woocommerce-account:not(.logged-in) .site-main > .container { padding-top: 16px; }
+	.auth { border-radius: var(--r-card); }
+	.auth__card { padding: 24px 18px 28px; }
+	.auth-tabs { margin-bottom: 22px; }
+	.auth__brand { padding: 26px 20px; }
+	.auth__perks { grid-template-columns: 1fr; }
+	.auth-form__row { flex-direction: row; }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

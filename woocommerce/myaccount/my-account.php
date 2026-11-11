@@ -23,8 +23,12 @@ $alph_stats = array(
 		<div class="account-hero__who">
 			<span class="account-hero__avatar"><?php echo get_avatar( $alph_user->ID, 72, 'mystery', '' ); ?></span>
 			<div>
-				<?php /* translators: %s: first name */ ?>
-				<h2 class="account-hero__title"><?php echo esc_html( sprintf( __( 'Welcome back, %s!', 'alphonsus' ), $alph_name ) ); ?></h2>
+				<?php
+				$alph_is_new = ( time() - strtotime( $alph_user->user_registered . ' UTC' ) ) < DAY_IN_SECONDS;
+				/* translators: %s: first name */
+				$alph_hello = $alph_is_new ? __( 'Welcome, %s!', 'alphonsus' ) : __( 'Welcome back, %s!', 'alphonsus' );
+				?>
+				<h2 class="account-hero__title"><?php echo esc_html( sprintf( $alph_hello, $alph_name ) ); ?></h2>
 				<p class="account-hero__meta">
 					<span class="chip chip--gold"><?php echo alph_icon( 'award', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( alph_rj_level( alph_rj_xp( $alph_rj ) )[0] ); ?></span>
 					<?php /* translators: %s: month and year */ ?>
