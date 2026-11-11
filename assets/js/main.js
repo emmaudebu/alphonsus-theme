@@ -39,6 +39,7 @@
 			overlay.hidden = ! open;
 		}
 		document.documentElement.style.overflow = open ? 'hidden' : '';
+		document.documentElement.classList.toggle( 'nav-open', open );
 		if ( open ) {
 			var first = nav.querySelector( '.menu a' );
 			if ( first ) {
