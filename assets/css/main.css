@@ -214,7 +214,8 @@ a.chip:hover { filter: brightness(.97); }
 .translate__btn strong { color: var(--ink); font-weight: 600; }
 .translate__panel { position: absolute; right: 0; top: calc(100% + 6px); background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--e3); padding: 12px; min-width: 220px; z-index: 70; }
 .goog-te-gadget { font-size: 0 !important; color: transparent !important; }
-.goog-te-gadget select { font-size: 14px; width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line); }
+.goog-te-gadget select { font-size: 14px; width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line); color: var(--primary) !important; background: #fff; }
+.goog-te-gadget option { color: var(--primary); background: #fff; }
 .goog-te-banner-frame, .skiptranslate iframe { display: none !important; }
 body { top: 0 !important; }
 .nav-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(22, 26, 48, .45); }
