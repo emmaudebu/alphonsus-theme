@@ -11,7 +11,7 @@ get_header();
 
 $alph_slug     = alph_mod( 'mc_cat' );
 $alph_cat      = get_term_by( 'slug', $alph_slug, 'product_cat' );
-$alph_products = function_exists( 'alph_section_products' ) ? alph_section_products( $alph_slug, '', 16 ) : array();
+$alph_products = function_exists( 'alph_section_products' ) ? alph_section_products( $alph_slug, '', 60 ) : array();
 $alph_subcats  = $alph_cat ? get_terms(
 	array(
 		'taxonomy'   => 'product_cat',

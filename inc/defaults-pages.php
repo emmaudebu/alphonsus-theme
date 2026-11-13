@@ -168,7 +168,7 @@ function alph_pages_schema() {
 			'fields' => array(
 				'mc_eyebrow'  => array( __( 'Hero eyebrow', 'alphonsus' ), 'Atelier & goods', 'text' ),
 				'mc_title'    => array( __( 'Hero title', 'alphonsus' ), 'Wear Your Love for Literature & Nordic-African Heritage.', 'text' ),
-				'mc_text'     => array( __( 'Hero text', 'alphonsus' ), 'Reader essentials, bags and stationery made to accompany your most ambitious reading voyages.', 'textarea' ),
+				'mc_text'     => array( __( 'Hero text', 'alphonsus' ), 'Story-inspired umbrellas, socks and exercise books featuring the characters children love from our African story collection.', 'textarea' ),
 				'mc_stats'    => array( __( 'Hero stats (value | label) — empty hides', 'alphonsus' ), '', 'lines' ),
 				'mc_image'    => array( __( 'Hero image', 'alphonsus' ), 0, 'image' ),
 				'mc_cat'      => array( __( 'Merch category slug', 'alphonsus' ), 'merch', 'text' ),

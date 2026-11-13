@@ -209,6 +209,9 @@ function alph_card_button( WC_Product $product, $large = false, $labelled = fals
  */
 function alph_product_author( WC_Product $product ) {
 	$author = trim( (string) $product->get_meta( '_alph_author' ) );
+	if ( '' === $author && alph_is_merch( $product ) ) {
+		return ''; // Umbrellas and socks don't have an author.
+	}
 	$author = '' !== $author ? $author : (string) alph_mod( 'default_author' );
 	if ( '' === $author ) {
 		return '';
@@ -218,12 +221,35 @@ function alph_product_author( WC_Product $product ) {
 }
 
 /**
+ * Is the product in the Merch category (or one of its sub-categories)?
+ */
+function alph_is_merch( WC_Product $product ) {
+	$merch = get_term_by( 'slug', alph_mod( 'mc_cat' ), 'product_cat' );
+	if ( ! $merch ) {
+		return false;
+	}
+	$id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+	foreach ( wp_get_post_terms( $id, 'product_cat', array( 'fields' => 'ids' ) ) as $term_id ) {
+		if ( (int) $term_id === (int) $merch->term_id || term_is_ancestor_of( $merch->term_id, $term_id, 'product_cat' ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * The most specific category name to show on a card (skips the generic "Books").
  */
 function alph_product_kicker( WC_Product $product ) {
 	$terms = get_the_terms( $product->get_id(), 'product_cat' );
 	if ( ! $terms || is_wp_error( $terms ) ) {
 		return '';
+	}
+	// Prefer a sub-category (e.g. "Umbrellas" over "Merch").
+	foreach ( $terms as $term ) {
+		if ( $term->parent && 'books' !== $term->slug ) {
+			return $term->name;
+		}
 	}
 	foreach ( $terms as $term ) {
 		if ( 'books' !== $term->slug ) {
@@ -264,10 +290,12 @@ function alph_product_card( WC_Product $product, $heading = 'h3', array $opts = 
 	$kicker = alph_product_kicker( $product );
 	$url    = $product->get_permalink();
 	$tag    = in_array( $heading, array( 'h2', 'h3' ), true ) ? $heading : 'h3';
+	$meta   = wp_get_attachment_metadata( (int) $product->get_image_id() );
+	$wide   = ! empty( $meta['width'] ) && ! empty( $meta['height'] ) && $meta['width'] > $meta['height'] * 1.15;
 	$text   = ! empty( $opts['excerpt'] ) ? wp_trim_words( wp_strip_all_tags( $product->get_short_description() ? $product->get_short_description() : $product->get_description() ), 14 ) : '';
 	?>
 	<article class="card product-card<?php echo $product->is_on_sale() ? ' is-sale' : ''; ?>">
-		<div class="product-card__media">
+		<div class="product-card__media<?php echo $wide ? ' product-card__media--wide' : ''; ?>">
 			<a href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
 				<?php echo $product->get_image( 'woocommerce_thumbnail', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			</a>
@@ -288,12 +316,27 @@ function alph_product_card( WC_Product $product, $heading = 'h3', array $opts = 
 				<p class="product-card__text"><?php echo esc_html( $text ); ?></p>
 			<?php endif; ?>
 			<div class="product-card__foot">
-				<span class="price"><?php echo $product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<span class="price"><?php echo alph_card_price_html( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 				<?php echo alph_card_button( $product ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			</div>
 		</div>
 	</article>
 	<?php
+}
+
+/**
+ * Card price: products with options show "From ₦…" instead of a full range.
+ */
+function alph_card_price_html( WC_Product $product ) {
+	if ( $product->is_type( 'variable' ) ) {
+		$min = (float) $product->get_variation_price( 'min', true );
+		$max = (float) $product->get_variation_price( 'max', true );
+		if ( $min !== $max ) {
+			/* translators: %s: lowest price */
+			return '<span class="price__from">' . esc_html__( 'From', 'alphonsus' ) . '</span> ' . wc_price( $min );
+		}
+	}
+	return $product->get_price_html();
 }
 
 /**
