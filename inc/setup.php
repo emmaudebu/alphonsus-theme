@@ -164,3 +164,28 @@ add_filter(
 		return $classes;
 	}
 );
+
+/**
+ * Some third-party updaters (WP Pusher) add update entries without the `plugin`
+ * field, which makes Plugins → Add New warn "Undefined property: stdClass::$plugin".
+ * The array key is the plugin file, so fill it in from there.
+ */
+add_filter(
+	'site_transient_update_plugins',
+	function ( $value ) {
+		if ( ! is_object( $value ) ) {
+			return $value;
+		}
+		foreach ( array( 'response', 'no_update' ) as $list ) {
+			if ( empty( $value->$list ) || ! is_array( $value->$list ) ) {
+				continue;
+			}
+			foreach ( $value->$list as $file => $item ) {
+				if ( is_object( $item ) && empty( $item->plugin ) ) {
+					$item->plugin = $file;
+				}
+			}
+		}
+		return $value;
+	}
+);
