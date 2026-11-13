@@ -28,6 +28,7 @@ $alph_refund  = get_page_by_path( 'no-refund-cancellation-policy' );
 $alph_attrs   = array_filter( $product->get_attributes(), fn( $a ) => $a->get_visible() );
 $alph_specs   = $alph_attrs || $product->has_weight() || $product->has_dimensions() || $product->get_sku();
 $alph_reviews = comments_open() || $product->get_review_count();
+$alph_merch   = alph_is_merch( $product );
 $alph_n       = 0;
 ?>
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'ps', $product ); ?>>
@@ -116,11 +117,11 @@ $alph_n       = 0;
 
 	<section class="ps__notes" aria-labelledby="ps-notes-title">
 		<p class="eyebrow"><?php esc_html_e( 'In-depth exploration', 'alphonsus' ); ?></p>
-		<h2 id="ps-notes-title" class="shead__title shead__title--ink"><?php esc_html_e( 'Book Notes & Details', 'alphonsus' ); ?></h2>
+		<h2 id="ps-notes-title" class="shead__title shead__title--ink"><?php echo esc_html( $alph_merch ? __( 'Product Notes & Details', 'alphonsus' ) : __( 'Book Notes & Details', 'alphonsus' ) ); ?></h2>
 		<div class="faq">
 			<?php if ( trim( get_the_content() ) ) : ?>
 				<details class="faq__item" open>
-					<summary><span class="faq__num"><?php echo esc_html( sprintf( '%02d', ++$alph_n ) ); ?></span><span class="faq__q"><?php esc_html_e( 'About this book', 'alphonsus' ); ?></span><?php echo alph_icon( 'chevron', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></summary>
+					<summary><span class="faq__num"><?php echo esc_html( sprintf( '%02d', ++$alph_n ) ); ?></span><span class="faq__q"><?php echo esc_html( $alph_merch ? __( 'About this item', 'alphonsus' ) : __( 'About this book', 'alphonsus' ) ); ?></span><?php echo alph_icon( 'chevron', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></summary>
 					<div class="faq__a entry-content"><?php the_content(); ?></div>
 				</details>
 			<?php endif; ?>
