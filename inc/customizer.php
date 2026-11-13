@@ -37,6 +37,7 @@ add_action(
 			'image'    => 'absint',
 			'number'   => 'absint',
 			'datetime' => 'sanitize_text_field',
+			'checkbox' => fn( $v ) => $v ? 1 : 0,
 		);
 
 		foreach ( alph_settings_schema() as $section_id => $section ) {
@@ -80,7 +81,7 @@ add_action(
 					array(
 						'label'   => $label,
 						'section' => $section_id,
-						'type'    => in_array( $type, array( 'textarea', 'lines' ), true ) ? 'textarea' : ( 'number' === $type ? 'number' : ( 'email' === $type ? 'email' : 'text' ) ),
+						'type'    => in_array( $type, array( 'textarea', 'lines' ), true ) ? 'textarea' : ( in_array( $type, array( 'number', 'email', 'checkbox' ), true ) ? $type : 'text' ),
 					)
 				);
 			}

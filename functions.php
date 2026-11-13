@@ -20,6 +20,7 @@ require ALPH_DIR . '/inc/customizer.php';
 require ALPH_DIR . '/inc/forms.php';
 require ALPH_DIR . '/inc/sections.php';
 require ALPH_DIR . '/inc/install.php';
+require ALPH_DIR . '/inc/demo.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require ALPH_DIR . '/inc/woocommerce.php';

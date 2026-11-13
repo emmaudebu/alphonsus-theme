@@ -118,6 +118,18 @@ function alph_settings_schema() {
 				'newsletter_text'  => array( __( 'Newsletter text', 'alphonsus' ), 'Receive weekly educational recommendations, Swedish practice worksheets, early access to new imports, and community library updates.', 'textarea' ),
 			),
 		),
+		'alph_demo'       => array(
+			'title'  => __( 'Demo mode', 'alphonsus' ),
+			'fields' => array(
+				'demo_on'         => array( __( 'Turn on demo mode (logged-in staff are never timed or locked). Switching it off and on again restarts every visitor’s timer.', 'alphonsus' ), 0, 'checkbox' ),
+				'demo_minutes'    => array( __( 'Demo length (minutes)', 'alphonsus' ), 30, 'number' ),
+				'demo_lock_hours' => array( __( 'Lock the site for (hours) once the demo ends', 'alphonsus' ), 2, 'number' ),
+				'demo_by_ip'      => array( __( 'Stop private-window restarts by also tracking the visitor’s network (people on the same Wi-Fi share one timer)', 'alphonsus' ), 1, 'checkbox' ),
+				'demo_banner'     => array( __( 'Banner message', 'alphonsus' ), 'You’re viewing a demo of the Alphonsus Library website.', 'text' ),
+				'demo_lock_title' => array( __( 'Lock screen title', 'alphonsus' ), 'Demo time is over', 'text' ),
+				'demo_lock_text'  => array( __( 'Lock screen message', 'alphonsus' ), 'Thank you for exploring the Alphonsus Library demo. The preview is paused for now and will open again automatically when the timer below runs out.', 'textarea' ),
+			),
+		),
 	);
 
 	$schema += alph_pages_schema();

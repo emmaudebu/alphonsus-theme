@@ -60,6 +60,7 @@ Product star ratings only appear when a product has real WooCommerce reviews.
 | Search | Header search with category select and live suggestions (REST) | `inc/search.php` |
 | Currency picker | Modal listing the Multi-Currency plugin's enabled currencies and rates; sets the plugin's cookie | `inc/currency.php` |
 | Language | Google Translate, loaded only when a visitor opens the language menu | `assets/js/main.js` |
+| Demo mode | Off by default. Customizer → Demo mode: each visitor gets a timed preview with a "Demo" bar and countdown, then the site shows a lock screen for the set number of hours. The timer survives page loads, cookie clearing and (optionally) private windows on the same network. Logged-in staff are never timed. Switching it off and on restarts every timer | `inc/demo.php`, `template-parts/demo-locked.php` |
 
 Shortcodes: `[alphonsus_contact_form]`, `[alphonsus_preorder_form]`, `[alphonsus_wishlist]`.
 

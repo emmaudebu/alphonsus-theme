@@ -327,6 +327,30 @@
 		}
 	} );
 
+	/* Demo mode timer (reload when it hits zero; the server shows the lock screen) */
+
+	var demoBar = document.querySelector( '[data-demo-left]' );
+	if ( demoBar ) {
+		var demoEnd = Date.now() + Number( demoBar.getAttribute( 'data-demo-left' ) ) * 1000;
+		var demoClock = demoBar.querySelector( '[data-demo-clock]' );
+		var pad = function ( n ) {
+			return ( n < 10 ? '0' : '' ) + n;
+		};
+		( function demoTick() {
+			var s = Math.max( 0, Math.round( ( demoEnd - Date.now() ) / 1000 ) );
+			var h = Math.floor( s / 3600 );
+			demoClock.textContent = ( h ? h + ':' : '' ) + pad( Math.floor( ( s % 3600 ) / 60 ) ) + ':' + pad( s % 60 );
+			demoBar.classList.toggle( 'is-ending', s <= 60 );
+			if ( s === 0 ) {
+				setTimeout( function () {
+					location.reload();
+				}, 1000 );
+				return;
+			}
+			setTimeout( demoTick, 1000 );
+		} )();
+	}
+
 	/* Google Translate (loaded only when a visitor asks for it) ------- */
 
 	var translateBtn = document.querySelector( '[data-translate]' );
