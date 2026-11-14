@@ -2,7 +2,8 @@
 /**
  * Serve "image.png.webp" in place of "image.png" whenever that smaller copy
  * exists in the uploads folder. Nothing in the database changes, and images
- * without a WebP copy keep their original file.
+ * without a WebP copy keep their original file. Only the public site is
+ * affected: wp-admin (including product CSV exports) and WP-CLI see originals.
  *
  * @package Alphonsus
  */
@@ -16,7 +17,7 @@ function alph_webp_url( $url ) {
 	static $uploads = null;
 	static $cache   = array();
 
-	if ( ! is_string( $url ) || ! preg_match( '/\.(jpe?g|png)$/i', $url ) ) {
+	if ( ! is_string( $url ) || ! preg_match( '/\.(jpe?g|png)$/i', $url ) || is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 		return $url;
 	}
 	if ( isset( $cache[ $url ] ) ) {
