@@ -21,6 +21,7 @@ require ALPH_DIR . '/inc/forms.php';
 require ALPH_DIR . '/inc/sections.php';
 require ALPH_DIR . '/inc/install.php';
 require ALPH_DIR . '/inc/demo.php';
+require ALPH_DIR . '/inc/webp.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require ALPH_DIR . '/inc/woocommerce.php';
