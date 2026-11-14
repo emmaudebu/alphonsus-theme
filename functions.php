@@ -33,4 +33,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	require ALPH_DIR . '/inc/reading.php';
 	require ALPH_DIR . '/inc/account.php';
 	require ALPH_DIR . '/inc/auth.php';
+	require ALPH_DIR . '/inc/downloads.php';
 }
